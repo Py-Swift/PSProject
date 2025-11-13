@@ -63,7 +63,7 @@ jobs:
       - uses: ncipollo/release-action@v1
         with:
           artifacts: "PSProject.tar.gz"
-          token: ${{ secrets.Homebrew }}
+          token: ${{ secrets.HOMEBREW }}
           allowUpdates: true
           omitBodyDuringUpdate: true
           omitNameDuringUpdate: true
@@ -106,7 +106,7 @@ jobs:
       - name: Pushes to another repository
         uses: cpina/github-action-push-to-another-repository@main
         env:
-          API_TOKEN_GITHUB: ${{ secrets.Homebrew }}
+          API_TOKEN_GITHUB: ${{ secrets.HOMEBREW }}
         with:
           source-directory: 'homebrew-tools'
           destination-github-username: 'pythonswiftlink'

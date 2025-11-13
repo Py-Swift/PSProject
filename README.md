@@ -29,6 +29,19 @@ brew upgrade --formula psproject
 
 Alternatively, you can build PSProject from source using Swift Package Manager.
 
+```bash
+git clone https://github.com/Py-Swift/PSProject
+cd psproject
+swift build -c release --disable-sandbox --product PSProject
+```
+intel
+```bash
+.build/x86_64-apple-macosx/release/PSProject
+```
+arm64
+```bash
+.build/arm64-apple-macosx/release/PSProject
+```
 ## Usage
 
 ### Create a New Project

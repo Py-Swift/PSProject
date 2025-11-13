@@ -96,7 +96,7 @@ jobs:
       - name: generate formula
         run: |
           mkdir homebrew_formula
-          python3.10 generate_formula.py ${{ needs.mainjob1.outputs.version }} ${{ needs.mainjob1.outputs.sha }}
+          python3.13 generate_formula.py ${{ needs.mainjob1.outputs.version }} ${{ needs.mainjob1.outputs.sha }}
 
       - name: clone tools and update
         run: |

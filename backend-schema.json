@@ -83,86 +83,97 @@
       "patternProperties": {
         ".*": {
           "type": "object",
-          "required": ["url"],
-          "properties": {
-            "url": {
-              "type": "string",
-              "format": "uri",
-              "description": "Git URL of the package"
-            },
-            "path": {
-              "type": "string",
-              "description": "Local path to the package"
-            },
-            "revision": {
-              "type": "string",
-              "description": "Git commit hash"
-            },
-            "branch": {
-              "type": "string",
-              "description": "Git branch name"
-            },
-            "exactVersion": {
-              "type": "string",
-              "description": "Exact semantic version"
-            },
-            "versionRange": {
-              "type": "object",
-              "description": "Version range specification",
-              "required": ["minimumVersion", "maximumVersion"],
+          "oneOf": [
+            {
+              "required": ["url"],
               "properties": {
-                "minimumVersion": {
+                "url": {
                   "type": "string",
-                  "description": "Minimum version"
+                  "format": "uri",
+                  "description": "Git URL of the package"
                 },
-                "maximumVersion": {
+                "revision": {
                   "type": "string",
-                  "description": "Maximum version"
-                }
-              }
-            },
-            "upToNextMinorVersion": {
-              "type": "string",
-              "description": "Up to next minor version from specified version"
-            },
-            "upToNextMajorVersion": {
-              "type": "string",
-              "description": "Up to next major version from specified version"
-            },
-            "versionRequirement": {
-              "type": "object",
-              "description": "Version requirement specification (legacy)",
-              "oneOf": [
-                {
-                  "required": ["branch"],
+                  "description": "Git commit hash"
+                },
+                "branch": {
+                  "type": "string",
+                  "description": "Git branch name"
+                },
+                "exactVersion": {
+                  "type": "string",
+                  "description": "Exact semantic version"
+                },
+                "versionRange": {
+                  "type": "object",
+                  "description": "Version range specification",
+                  "required": ["minimumVersion", "maximumVersion"],
                   "properties": {
-                    "branch": {
+                    "minimumVersion": {
                       "type": "string",
-                      "description": "Git branch name"
+                      "description": "Minimum version"
+                    },
+                    "maximumVersion": {
+                      "type": "string",
+                      "description": "Maximum version"
                     }
                   }
                 },
-                {
-                  "required": ["version"],
-                  "properties": {
-                    "version": {
-                      "type": "string",
-                      "description": "Semantic version"
-                    }
-                  }
+                "upToNextMinorVersion": {
+                  "type": "string",
+                  "description": "Up to next minor version from specified version"
                 },
-                {
-                  "required": ["revision"],
-                  "properties": {
-                    "revision": {
-                      "type": "string",
-                      "description": "Git commit hash"
+                "upToNextMajorVersion": {
+                  "type": "string",
+                  "description": "Up to next major version from specified version"
+                },
+                "versionRequirement": {
+                  "type": "object",
+                  "description": "Version requirement specification (legacy)",
+                  "oneOf": [
+                    {
+                      "required": ["branch"],
+                      "properties": {
+                        "branch": {
+                          "type": "string",
+                          "description": "Git branch name"
+                        }
+                      }
+                    },
+                    {
+                      "required": ["version"],
+                      "properties": {
+                        "version": {
+                          "type": "string",
+                          "description": "Semantic version"
+                        }
+                      }
+                    },
+                    {
+                      "required": ["revision"],
+                      "properties": {
+                        "revision": {
+                          "type": "string",
+                          "description": "Git commit hash"
+                        }
+                      }
                     }
-                  }
+                  ]
                 }
-              ]
+              },
+              "additionalProperties": false
+            },
+            {
+              "required": ["path"],
+              "properties": {
+                "path": {
+                  "type": "string",
+                  "description": "Local path to the package"
+                }
+              },
+              "additionalProperties": false
             }
-          }
+          ]
         }
       }
     },

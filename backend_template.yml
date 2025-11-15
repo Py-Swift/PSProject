@@ -1,0 +1,180 @@
+
+name: Template
+backend_dependencies: []
+exclude_dependencies:
+  - SomeDependencyToExclude
+downloads:
+  - http://example.com/somefile.zip
+
+frameworks:
+  - ${PS_SUPPORT}/SDL2.xcframework
+  - ${PS_SUPPORT}/SDL2_image.xcframework
+  - ${PS_SUPPORT}/SDL2_mixer.xcframework
+  - ${PS_SUPPORT}/SDL2_ttf.xcframework
+
+target_dependencies:
+  - type: framework
+    reference: Support/SDL2.xcframework
+    platformFilter: iOS
+  - type: framework
+    reference: Support/SDL2_image.xcframework
+    platformFilter: iOS
+  - type: framework
+    reference: Support/SDL2_mixer.xcframework
+    platformFilter: iOS
+  - type: framework
+    reference: Support/SDL2_ttf.xcframework
+    platformFilter: iOS
+
+packages:
+  Package1:
+    url: https://github.com/some-user/Package1
+    revision: "a543bcdef1234567890abcdef1234567890abcdef"
+  Package2:
+    url: https://github.com/some-user/Package2
+    branch: master
+  Package3:
+    url: https://github.com/some-user/Package3
+    exactVersion: "1.0.0"
+  Package4:
+    url: https://github.com/some-user/Package4
+    versionRange:
+      minimumVersion: "2.0.0"
+      maximumVersion: "3.0.0"
+  Package5:
+    url: https://github.com/some-user/Package5
+    upToNextMinorVersion: "4.1.0"
+  Package6:
+    url: https://github.com/some-user/Package6
+    upToNextMajorVersion: "5.0.0"
+  Package7:
+    path: ../local-packages/Package7
+
+wrapper_imports:
+  all:
+    libraries:
+      - Admob
+    modules: []
+  iOS:
+    libraries:
+      - a4k_pyswift
+    modules:
+      - .a4k_pyswift
+
+install:
+  - type: shell
+    shell: python
+    file: install.py
+  - type: shell
+    shell: bash
+    file: install.sh
+  - type: shell
+    shell: zsh
+    file: install.zsh
+  - type: shell
+    shell: ruby
+    file: install.rb
+  - type: shell
+    shell: fish
+    file: install.fish
+
+  - type: shell
+    shell: python
+    run: ""
+  - type: shell
+    shell: bash
+    run: ""
+  - type: shell
+    shell: zsh
+    run: ""
+  - type: shell
+    shell: ruby
+    run: ""
+  - type: shell
+    shell: fish
+    run: ""
+    
+copy_to_site_packages:
+  - type: shell
+    shell: python
+    file: site_packages_install.py
+  - type: shell
+    shell: bash
+    file: site_packages_install.sh
+  - type: shell
+    shell: zsh
+    file: site_packages_install.zsh
+  - type: shell
+    shell: ruby
+    file: site_packages_install.rb
+  - type: shell
+    shell: fish
+    file: site_packages_install.fish
+
+  - type: shell
+    shell: python
+    run: ""
+  - type: shell
+    shell: bash
+    run: ""
+  - type: shell
+    shell: zsh
+    run: ""
+  - type: shell
+    shell: ruby
+    run: ""
+  - type: shell
+    shell: fish
+    run: ""
+
+plist_entries:
+  CFBundleURLTypes:
+    - CFBundleURLName: com.example.app
+      CFBundleURLSchemes:
+        - example-scheme
+  LSApplicationQueriesSchemes:
+    - example-scheme
+  AllowSomething: true
+  NSAppTransportSecurity:
+    NSAllowsArbitraryLoads: true
+    url: 
+      - http://example.com
+      - https://example.com
+
+
+will_modify_main_swift:
+  all: false
+  iOS: true
+
+modify_main_swift:
+  - type: shell
+    shell: python
+    file: main_swift.py
+  - type: shell
+    shell: bash
+    file: main_swift.sh
+  - type: shell
+    shell: zsh
+    file: main_swift.zsh
+  - type: shell
+    shell: ruby
+    file: main_swift.rb
+  - type: shell
+    shell: fish
+    file: main_swift.fish
+
+  - type: shell
+    shell: python
+    run: ""
+  - type: shell
+    shell: bash
+    run: ""
+  - type: shell
+    shell: zsh
+    run: ""
+  - type: shell
+    shell: ruby
+    run: ""
+  - type: shell
+    shell: fish
+    run: ""

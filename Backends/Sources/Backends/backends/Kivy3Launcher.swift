@@ -32,7 +32,7 @@ public final class Kivy3Launcher: SDL3Backend {
     }
     
     public override func exclude_dependencies() throws -> [String] {
-        ["kivy"]
+        ["kivy.2", "kivy.3", "kivy==", "kivy>=", "kivy>"]
     }
     
     public override func packages() async throws -> [String : SwiftPackage] {

@@ -55,15 +55,15 @@ extension PSProject {
                 
                 var extra_index: [String] = []
                 if let psproject = toml.tool?.psproject {
-                    extra_index.append(contentsOf: psproject.extra_index)
+                    extra_index.append(contentsOf: psproject.extra_index.resolved_path(prefix: uv))
                     switch t {
                         case .iOS:
                             if let ios = psproject.ios {
-                                extra_index.append(contentsOf: ios.extra_index)
+                                extra_index.append(contentsOf: ios.extra_index.resolved_path(prefix: uv))
                             }
                         case .macOS:
                             if let macos = psproject.macos {
-                                extra_index.append(contentsOf: macos.extra_index)
+                                extra_index.append(contentsOf: macos.extra_index.resolved_path(prefix: uv))
                             }
                         default: fatalError()
                     }
@@ -140,7 +140,7 @@ extension PSProject {
             let toml_path = (uv_abs + "pyproject.toml")
             let toml = try toml_path.loadPyProjectToml()
             
-            guard let psproject = toml.tool?.psproject else {
+            guard let _ = toml.tool?.psproject else {
                 fatalError("tool.psproject in pyproject.toml not found")
             }
             
@@ -259,7 +259,7 @@ extension Tool.PSProject {
         
         var plats: [any ContextProtocol] = []
         //guard let psproject = tool?.psproject else { return plats }
-        if let ios {
+        if let _ = ios {
             plats.append(try PlatformContext(arch: Archs.Arm64(), sdk: SDKS.IphoneOS(), root: workingDir))
             switch arch_info {
                 case .intel64:
@@ -270,7 +270,7 @@ extension Tool.PSProject {
             }
         }
         
-        if let macos  {
+        if let _ = macos  {
             switch arch_info {
                 case .intel64:
                     plats.append(try PlatformContext(arch: Archs.X86_64(), sdk: SDKS.MacOS(), root: workingDir))
@@ -285,3 +285,12 @@ extension Tool.PSProject {
         
     }
     }
+
+
+extension [String] {
+    func resolved_path(prefix: Path) -> Self {
+        map { element in
+            element.resolve_path(prefix: prefix, file_url: true)
+        }
+    }
+}

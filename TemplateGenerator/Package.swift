@@ -1,33 +1,33 @@
-// swift-tools-version: 6.1
+// swift-tools-version: 6.0
 // The swift-tools-version declares the minimum version of Swift required to build this package.
 
 import PackageDescription
 
 let package = Package(
-    name: "PSTools",
-    platforms: [
-        .macOS(.v15),
-    ],
+    name: "TemplateGenerator",
+    platforms: [.macOS(.v15)],
     products: [
         // Products define the executables and libraries a package produces, making them visible to other packages.
         .library(
-            name: "PSTools",
-            targets: ["PSTools"]),
+            name: "TemplateGenerator",
+            targets: ["TemplateGenerator"]),
     ],
     dependencies: [
+        .package(url: "https://github.com/swiftlang/swift-syntax.git", .upToNextMajor(from: .init(601, 0, 0))),
         .package(url: "https://github.com/kylef/PathKit", .upToNextMajor(from: "1.0.1")),
-        .package(url: "https://github.com/yonaskolb/XcodeGen.git", from: "2.42.0"),
     ],
     targets: [
         // Targets are the basic building blocks of a package, defining a module or a test suite.
         // Targets can depend on other targets in this package and products from dependencies.
         .target(
-            name: "PSTools",
+            name: "TemplateGenerator",
             dependencies: [
-                "PathKit",
-                .product(name: "ProjectSpec", package: "XcodeGen"),
-            ],
-            swiftSettings: [.swiftLanguageMode(.v5)]
+                .product(name: "SwiftSyntax", package: "swift-syntax"),
+                .product(name: "SwiftParser", package: "swift-syntax"),
+                //.product(name: "SwiftSyntaxParser", package: "swift-syntax"),
+                .product(name: "SwiftSyntaxBuilder", package: "swift-syntax"),
+                .byName(name: "PathKit"),
+            ]
         ),
 
     ]

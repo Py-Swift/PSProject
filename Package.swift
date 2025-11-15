@@ -35,6 +35,7 @@ func getDependencies() -> [Package.Dependency] {[
     .package(url: "https://github.com/yonaskolb/XcodeGen.git", from: "2.42.0"),
     .package(url: "https://github.com/Py-Swift/XCAssetsProcessor", .upToNextMajor(from: "0.0.0")),
     .package(url: "https://github.com/tuist/XcodeProj.git", .upToNextMajor(from: "8.24.3")),
+    .package(path: "./TemplateGenerator")
     
 ]}
 
@@ -45,8 +46,10 @@ let targets: [Target] = [
             .product(name: "ArgumentParser", package: "swift-argument-parser"),
             .product(name: "WheelBuilder", package: "WheelBuilder"),
             .product(name: "PipRepo", package: "WheelBuilder"),
+            .product(name: "ProjectSpec", package: "XcodeGen"),
             "XcodeProjectBuilder",
-            "PathKit"
+            "PathKit",
+            "TemplateGenerator"
         ],
         swiftSettings: [
             .swiftLanguageMode(.v5)

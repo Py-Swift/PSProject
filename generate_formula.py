@@ -17,7 +17,7 @@ class Psproject < Formula
   desc ""
   homepage ""
 
-  url "https://github.com/PythonSwiftLink/PSProject/releases/download/{version}/PSProject.tar.gz"
+  url "https://github.com/Py-Swift/PSProject/releases/download/{version}/PSProject.tar.gz"
   version "{version}"
   sha256 "{sha}"
   license ""
@@ -38,7 +38,7 @@ class Psproject{version_name} < Formula
   desc ""
   homepage ""
 
-  url "https://github.com/PythonSwiftLink/PSProject/releases/download/{version}/PSProject.tar.gz"
+  url "https://github.com/Py-Swift/PSProject/releases/download/{version}/PSProject.tar.gz"
   version "{version}"
   sha256 "{sha}"
   license ""

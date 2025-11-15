@@ -1,0 +1,249 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://github.com/Py-Swift/PSProject/backend-schema.json",
+  "title": "PySwift Backend Configuration",
+  "description": "Schema for PySwift backend YAML configuration files",
+  "type": "object",
+  "required": ["name"],
+  "properties": {
+    "name": {
+      "type": "string",
+      "description": "Name of the backend"
+    },
+    "dependencies": {
+      "type": "array",
+      "description": "List of other backend dependencies",
+      "items": {
+        "type": "string"
+      }
+    },
+    "backend_dependencies": {
+      "type": "array",
+      "description": "List of backend dependencies",
+      "items": {
+        "type": "string"
+      }
+    },
+    "frameworks": {
+      "type": "array",
+      "description": "List of framework paths (can use ${PS_SUPPORT} variable)",
+      "items": {
+        "type": "string"
+      }
+    },
+    "target_dependencies": {
+      "type": "array",
+      "description": "Dependencies to add to the Xcode target",
+      "items": {
+        "type": "object",
+        "required": ["type", "reference"],
+        "properties": {
+          "type": {
+            "type": "string",
+            "enum": ["framework", "package"],
+            "description": "Type of dependency"
+          },
+          "reference": {
+            "type": "string",
+            "description": "Path or package name reference"
+          },
+          "products": {
+            "type": "array",
+            "description": "Product names for package dependencies",
+            "items": {
+              "type": "string"
+            }
+          },
+          "platformFilter": {
+            "type": "string",
+            "enum": ["iOS", "macOS", "tvOS", "watchOS"],
+            "description": "Platform filter for the dependency"
+          }
+        }
+      }
+    },
+    "packages": {
+      "type": "object",
+      "description": "Swift Package Manager packages to add",
+      "patternProperties": {
+        ".*": {
+          "type": "object",
+          "required": ["url"],
+          "properties": {
+            "url": {
+              "type": "string",
+              "format": "uri",
+              "description": "Git URL of the package"
+            },
+            "versionRequirement": {
+              "type": "object",
+              "description": "Version requirement specification",
+              "oneOf": [
+                {
+                  "required": ["branch"],
+                  "properties": {
+                    "branch": {
+                      "type": "string",
+                      "description": "Git branch name"
+                    }
+                  }
+                },
+                {
+                  "required": ["version"],
+                  "properties": {
+                    "version": {
+                      "type": "string",
+                      "description": "Semantic version"
+                    }
+                  }
+                },
+                {
+                  "required": ["revision"],
+                  "properties": {
+                    "revision": {
+                      "type": "string",
+                      "description": "Git commit hash"
+                    }
+                  }
+                }
+              ]
+            }
+          }
+        }
+      }
+    },
+    "wrapper_imports": {
+      "type": "object",
+      "description": "Import configurations for wrapper code generation",
+      "patternProperties": {
+        ".*": {
+          "type": "object",
+          "properties": {
+            "libraries": {
+              "type": "array",
+              "description": "Library names to import",
+              "items": {
+                "type": "string"
+              }
+            },
+            "modules": {
+              "type": "array",
+              "description": "Python modules to import",
+              "items": {
+                "type": "string"
+              }
+            }
+          }
+        }
+      }
+    },
+    "install": {
+      "type": "object",
+      "description": "Installation script configuration",
+      "required": ["type"],
+      "properties": {
+        "type": {
+          "type": "string",
+          "enum": ["shell"],
+          "description": "Type of installation script"
+        },
+        "shell": {
+          "type": "string",
+          "enum": ["python", "bash", "zsh", "sh"],
+          "description": "Shell/interpreter to use"
+        },
+        "file": {
+          "type": "string",
+          "description": "Path to the installation script file"
+        },
+        "run": {
+          "type": "string",
+          "description": "Inline script text to execute"
+        }
+      },
+      "oneOf": [
+        {
+          "required": ["file"]
+        },
+        {
+          "required": ["run"]
+        }
+      ]
+    },
+    "copy_to_site_packages": {
+      "type": "object",
+      "description": "Script to copy files to site-packages",
+      "required": ["type"],
+      "properties": {
+        "type": {
+          "type": "string",
+          "enum": ["shell"],
+          "description": "Type of script"
+        },
+        "shell": {
+          "type": "string",
+          "enum": ["python", "bash", "zsh", "sh"],
+          "description": "Shell/interpreter to use"
+        },
+        "file": {
+          "type": "string",
+          "description": "Path to the script file"
+        },
+        "run": {
+          "type": "string",
+          "description": "Inline script text to execute"
+        }
+      },
+      "oneOf": [
+        {
+          "required": ["file"]
+        },
+        {
+          "required": ["run"]
+        }
+      ]
+    },
+    "will_modify_main_swift": {
+      "type": "object",
+      "description": "Indicates if main.swift will be modified",
+      "patternProperties": {
+        ".*": {
+          "type": "boolean"
+        }
+      }
+    },
+    "modify_main_swift": {
+      "type": "object",
+      "description": "Script to modify main.swift",
+      "required": ["type"],
+      "properties": {
+        "type": {
+          "type": "string",
+          "enum": ["shell"],
+          "description": "Type of script"
+        },
+        "shell": {
+          "type": "string",
+          "enum": ["python", "bash", "zsh", "sh"],
+          "description": "Shell/interpreter to use"
+        },
+        "file": {
+          "type": "string",
+          "description": "Path to the script file"
+        },
+        "run": {
+          "type": "string",
+          "description": "Inline script text to execute"
+        }
+      },
+      "oneOf": [
+        {
+          "required": ["file"]
+        },
+        {
+          "required": ["run"]
+        }
+      ]
+    }
+  }
+}

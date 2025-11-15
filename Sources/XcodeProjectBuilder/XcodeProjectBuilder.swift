@@ -219,33 +219,42 @@ extension XcodeProjectBuilder {
         let py_new = new + "pyproject.toml"
         
         let modded = try TOMLTable(string: try pyproject.read())
-        var deps = modded["project"]?["dependencies"]?.array ?? []
-        for ext in excludes {
-            switch ext {
-                case "kivy":
-                    deps.removeAll(where: { dep in
-                        if let dep = dep.string {
-                            switch dep {
-                                case let reloader where reloader.hasPrefix("kivy-reloader"):
-                                    false
-                                default:
-                                    dep.hasPrefix(ext)
-                            }
-                        } else {
-                            false
-                        }
-                    })
-                default:
-                    deps.removeAll(where: { dep in
-                        if let dep = dep.string {
-                            dep.hasPrefix(ext)
-                        } else {
-                            false
-                        }
-                    })
+        var deps = (modded["project"]?["dependencies"]?.array ?? []).compactMap(\.string)
+        
+        deps.removeAll { dep in
+            //guard let dep = dep.string else { return false }
+            return excludes.contains { exc in
+                dep.hasPrefix(exc)
             }
-            
         }
+        
+//        for ext in excludes {
+//            
+//            switch ext {
+//                case "kivy":
+//                    deps.removeAll(where: { dep in
+//                        if let dep = dep.string {
+//                            switch dep {
+//                                case let reloader where reloader.hasPrefix("kivy-reloader"):
+//                                    false
+//                                default:
+//                                    dep.hasPrefix(ext)
+//                            }
+//                        } else {
+//                            false
+//                        }
+//                    })
+//                default:
+//                    deps.removeAll(where: { dep in
+//                        if let dep = dep.string {
+//                            dep.hasPrefix(ext)
+//                        } else {
+//                            false
+//                        }
+//                    })
+//            }
+//            
+//        }
         modded["project"]?["dependencies"] = deps.tomlValue
         
         try py_new.write(modded.convert())

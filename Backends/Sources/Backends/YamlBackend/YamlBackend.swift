@@ -15,7 +15,7 @@ extension SwiftPackage: Swift.Decodable {
     public init(from decoder: any Decoder) throws {
         
         
-        try Self.init(jsonDictionary: <#T##JSONDictionary#>)
+        fatalError()
     }
     
 }
@@ -33,7 +33,26 @@ public final class YamlBackend: Decodable {
 }
 
 extension YamlBackend {
-    
+    class Script: Decodable {
+        let type: ScriptType
+    }
+}
+
+extension YamlBackend.Script {
+    enum ScriptType: String, Decodable {
+        case shell
+    }
+    enum ShellType: String, Decodable {
+        case python
+        case sh
+        case bash
+        case fish
+        case ruby
+    }
+    enum Execution: Decodable {
+        case file(String)
+        case run(String)
+    }
 }
 
 extension YamlBackend: BackendProtocol {

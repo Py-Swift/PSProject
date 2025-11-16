@@ -32,6 +32,7 @@ extension PSProject.Create {
             try Validation.pyprojectExist(root: root)
             if !Validation.hostPython() { return }
             try Validation.backends()
+            try Validation.support()
             //let xcode_path = try Validation.xcodeProject(root: root)
             
             var targets: [ProjectSpec.Platform] = []

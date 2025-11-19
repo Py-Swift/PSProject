@@ -303,28 +303,28 @@ struct MobileWheelsChecker {
                 }
             }
             
-            // Separate results by source and type
+            // Separate results by source and type, sorted alphabetically
             let officialBinaryWheels = results.filter {
                 $0.source == .pypi &&
                 ($0.android == .success || $0.ios == .success) &&
                 !($0.android == .warning && $0.ios == .warning)
-            }
+            }.sorted { $0.name.lowercased() < $1.name.lowercased() }
             
             let pyswiftBinaryWheels = results.filter {
                 $0.source == .pyswift &&
                 ($0.android == .success || $0.ios == .success) &&
                 !($0.android == .warning && $0.ios == .warning)
-            }
+            }.sorted { $0.name.lowercased() < $1.name.lowercased() }
             
             let purePython = results.filter { 
                 $0.android == .purePython || $0.ios == .purePython
-            }
+            }.sorted { $0.name.lowercased() < $1.name.lowercased() }
             
             // Binary packages without mobile support (has binary wheels but not for iOS/Android)
             let binaryWithoutMobile = results.filter {
                 ($0.android == .warning && $0.ios == .warning) &&
                 ($0.android != .purePython && $0.ios != .purePython)
-            }
+            }.sorted { $0.name.lowercased() < $1.name.lowercased() }
             
             // Display Official Binary Wheels
             print("\n🔧 Official Binary Wheels (PyPI):")

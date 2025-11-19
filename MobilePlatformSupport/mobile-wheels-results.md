@@ -1,8 +1,8 @@
 # Mobile Platform Support Report
 
-**Generated:** 2025-11-19 15:59:45  
+**Generated:** 2025-11-19 16:32:51  
 **Packages Checked:** 50  
-**Dependency Checking:** Enabled
+**Dependency Checking:** Disabled
 
 ---
 
@@ -10,8 +10,8 @@
 
 Packages with official iOS/Android wheels available on PyPI.
 
-| Package | Android | iOS | Dependencies |
-|---------|---------|-----|-------------|
+| Package | Android | iOS |
+|---------|---------|-----|
 
 _No packages found._
 
@@ -20,73 +20,73 @@ _No packages found._
 
 Custom iOS/Android builds from [pypi.anaconda.org/pyswift/simple](https://pypi.anaconda.org/pyswift/simple).
 
-| Package | Android | iOS | Dependencies |
-|---------|---------|-----|-------------|
-| `numpy` | ⚠️ Not available | ✅ Supported | ✅ All supported (0) |
-| `cryptography` | ⚠️ Not available | ✅ Supported | ✅ All supported (0) |
-| `cffi` | ⚠️ Not available | ✅ Supported | ✅ All supported (0) |
-| `pydantic-core` | ⚠️ Not available | ✅ Supported | ✅ All supported (0) |
+| Package | Android | iOS |
+|---------|---------|-----|
+| `cffi` | ⚠️ Not available | ✅ Supported |
+| `cryptography` | ⚠️ Not available | ✅ Supported |
+| `numpy` | ⚠️ Not available | ✅ Supported |
+| `pydantic-core` | ⚠️ Not available | ✅ Supported |
 
 
 ## 🐍 Pure Python Packages
 
 Packages that work on all platforms (no binary dependencies).
-| Package | Android | iOS | Dependencies |
-|---------|---------|-----|-------------|
-| `boto3` | 🐍 Pure Python | 🐍 Pure Python | ✅ All supported (0) |
-| `urllib3` | 🐍 Pure Python | 🐍 Pure Python | ✅ All supported (0) |
-| `botocore` | 🐍 Pure Python | 🐍 Pure Python | ✅ All supported (0) |
-| `requests` | 🐍 Pure Python | 🐍 Pure Python | ✅ All supported (0) |
-| `certifi` | 🐍 Pure Python | 🐍 Pure Python | ✅ All supported (0) |
-| `charset-normalizer` | 🐍 Pure Python | 🐍 Pure Python | ✅ All supported (0) |
-| `idna` | 🐍 Pure Python | 🐍 Pure Python | ✅ All supported (0) |
-| `typing-extensions` | 🐍 Pure Python | 🐍 Pure Python | ✅ All supported (0) |
-| `aiobotocore` | 🐍 Pure Python | 🐍 Pure Python | ✅ All supported (0) |
-| `setuptools` | 🐍 Pure Python | 🐍 Pure Python | ✅ All supported (0) |
-| `python-dateutil` | 🐍 Pure Python | 🐍 Pure Python | ✅ All supported (0) |
-| `grpcio-status` | 🐍 Pure Python | 🐍 Pure Python | ✅ All supported (0) |
-| `packaging` | 🐍 Pure Python | 🐍 Pure Python | ✅ All supported (0) |
-| `six` | 🐍 Pure Python | 🐍 Pure Python | ✅ All supported (0) |
-| `s3transfer` | 🐍 Pure Python | 🐍 Pure Python | ✅ All supported (0) |
-| `s3fs` | 🐍 Pure Python | 🐍 Pure Python | ✅ All supported (0) |
-| `pydantic` | 🐍 Pure Python | 🐍 Pure Python | ✅ All supported (0) |
-| `pycparser` | 🐍 Pure Python | 🐍 Pure Python | ✅ All supported (0) |
-| `fsspec` | 🐍 Pure Python | 🐍 Pure Python | ✅ All supported (0) |
-| `click` | 🐍 Pure Python | 🐍 Pure Python | ✅ All supported (0) |
-| `attrs` | 🐍 Pure Python | 🐍 Pure Python | ✅ All supported (0) |
-| `pip` | 🐍 Pure Python | 🐍 Pure Python | ✅ All supported (0) |
-| `protobuf` | 🐍 Pure Python | 🐍 Pure Python | ✅ All supported (0) |
-| `jmespath` | 🐍 Pure Python | 🐍 Pure Python | ✅ All supported (0) |
-| `platformdirs` | 🐍 Pure Python | 🐍 Pure Python | ✅ All supported (0) |
-| `rsa` | 🐍 Pure Python | 🐍 Pure Python | ✅ All supported (0) |
-| `h11` | 🐍 Pure Python | 🐍 Pure Python | ✅ All supported (0) |
-| `pytz` | 🐍 Pure Python | 🐍 Pure Python | ✅ All supported (0) |
-| `anyio` | 🐍 Pure Python | 🐍 Pure Python | ✅ All supported (0) |
-| `pygments` | 🐍 Pure Python | 🐍 Pure Python | ✅ All supported (0) |
-| `sniffio` | 🐍 Pure Python | 🐍 Pure Python | ✅ All supported (0) |
-| `jinja2` | 🐍 Pure Python | 🐍 Pure Python | ✅ All supported (0) |
-| `annotated-types` | 🐍 Pure Python | 🐍 Pure Python | ✅ All supported (0) |
-| `importlib-metadata` | 🐍 Pure Python | 🐍 Pure Python | ✅ All supported (0) |
-| `pluggy` | 🐍 Pure Python | 🐍 Pure Python | ✅ All supported (0) |
-| `pyasn1` | 🐍 Pure Python | 🐍 Pure Python | ✅ All supported (0) |
-| `zipp` | 🐍 Pure Python | 🐍 Pure Python | ✅ All supported (0) |
-| `cachetools` | 🐍 Pure Python | 🐍 Pure Python | ✅ All supported (0) |
-| `filelock` | 🐍 Pure Python | 🐍 Pure Python | ✅ All supported (0) |
-| `wheel` | 🐍 Pure Python | 🐍 Pure Python | ✅ All supported (0) |
-| `tzdata` | 🐍 Pure Python | 🐍 Pure Python | ✅ All supported (0) |
-| `google-api-core` | 🐍 Pure Python | 🐍 Pure Python | ✅ All supported (0) |
-| `colorama` | 🐍 Pure Python | 🐍 Pure Python | ✅ All supported (0) |
+| Package | Android | iOS |
+|---------|---------|-----|
+| `aiobotocore` | 🐍 Pure Python | 🐍 Pure Python |
+| `annotated-types` | 🐍 Pure Python | 🐍 Pure Python |
+| `anyio` | 🐍 Pure Python | 🐍 Pure Python |
+| `attrs` | 🐍 Pure Python | 🐍 Pure Python |
+| `boto3` | 🐍 Pure Python | 🐍 Pure Python |
+| `botocore` | 🐍 Pure Python | 🐍 Pure Python |
+| `cachetools` | 🐍 Pure Python | 🐍 Pure Python |
+| `certifi` | 🐍 Pure Python | 🐍 Pure Python |
+| `charset-normalizer` | 🐍 Pure Python | 🐍 Pure Python |
+| `click` | 🐍 Pure Python | 🐍 Pure Python |
+| `colorama` | 🐍 Pure Python | 🐍 Pure Python |
+| `filelock` | 🐍 Pure Python | 🐍 Pure Python |
+| `fsspec` | 🐍 Pure Python | 🐍 Pure Python |
+| `google-api-core` | 🐍 Pure Python | 🐍 Pure Python |
+| `grpcio-status` | 🐍 Pure Python | 🐍 Pure Python |
+| `h11` | 🐍 Pure Python | 🐍 Pure Python |
+| `idna` | 🐍 Pure Python | 🐍 Pure Python |
+| `importlib-metadata` | 🐍 Pure Python | 🐍 Pure Python |
+| `jinja2` | 🐍 Pure Python | 🐍 Pure Python |
+| `jmespath` | 🐍 Pure Python | 🐍 Pure Python |
+| `packaging` | 🐍 Pure Python | 🐍 Pure Python |
+| `pip` | 🐍 Pure Python | 🐍 Pure Python |
+| `platformdirs` | 🐍 Pure Python | 🐍 Pure Python |
+| `pluggy` | 🐍 Pure Python | 🐍 Pure Python |
+| `protobuf` | 🐍 Pure Python | 🐍 Pure Python |
+| `pyasn1` | 🐍 Pure Python | 🐍 Pure Python |
+| `pycparser` | 🐍 Pure Python | 🐍 Pure Python |
+| `pydantic` | 🐍 Pure Python | 🐍 Pure Python |
+| `pygments` | 🐍 Pure Python | 🐍 Pure Python |
+| `python-dateutil` | 🐍 Pure Python | 🐍 Pure Python |
+| `pytz` | 🐍 Pure Python | 🐍 Pure Python |
+| `requests` | 🐍 Pure Python | 🐍 Pure Python |
+| `rsa` | 🐍 Pure Python | 🐍 Pure Python |
+| `s3fs` | 🐍 Pure Python | 🐍 Pure Python |
+| `s3transfer` | 🐍 Pure Python | 🐍 Pure Python |
+| `setuptools` | 🐍 Pure Python | 🐍 Pure Python |
+| `six` | 🐍 Pure Python | 🐍 Pure Python |
+| `sniffio` | 🐍 Pure Python | 🐍 Pure Python |
+| `typing-extensions` | 🐍 Pure Python | 🐍 Pure Python |
+| `tzdata` | 🐍 Pure Python | 🐍 Pure Python |
+| `urllib3` | 🐍 Pure Python | 🐍 Pure Python |
+| `wheel` | 🐍 Pure Python | 🐍 Pure Python |
+| `zipp` | 🐍 Pure Python | 🐍 Pure Python |
 
 
 ## ❌ Binary Packages Without Mobile Support
 
 Packages with binary wheels but no iOS/Android support.
 
-| Package | Android | iOS | Dependencies |
-|---------|---------|-----|-------------|
-| `pyyaml` | ⚠️ Not available | ⚠️ Not available | ✅ All supported (0) |
-| `pandas` | ⚠️ Not available | ⚠️ Not available | ✅ All supported (0) |
-| `markupsafe` | ⚠️ Not available | ⚠️ Not available | ✅ All supported (0) |
+| Package | Android | iOS |
+|---------|---------|-----|
+| `markupsafe` | ⚠️ Not available | ⚠️ Not available |
+| `pandas` | ⚠️ Not available | ⚠️ Not available |
+| `pyyaml` | ⚠️ Not available | ⚠️ Not available |
 
 
 ## 📈 Summary Statistics
@@ -108,13 +108,6 @@ Packages with binary wheels but no iOS/Android support.
 | Android Support | 0 / 4 | 0.0% |
 | iOS Support | 4 / 4 | 100.0% |
 | Both Platforms | 0 / 4 | 0.0% |
-### Dependency Analysis
-
-| Status | Count | Percentage |
-|--------|-------|------------|
-| All Dependencies Supported | 50 | 100.0% |
-| Some Dependencies Unsupported | 0 | 0.0% |
-| **Total Packages with Dependencies** | **50** | **100%** |
 
 ---
 

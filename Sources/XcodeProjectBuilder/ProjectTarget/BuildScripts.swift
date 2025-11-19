@@ -19,9 +19,14 @@ extension BuildScript.ScriptType: Swift.ExpressibleByStringLiteral {
 
 extension BuildScript {
     
-    static func installAppModule(pythonProject: Path) -> BuildScript {
+    static func installAppModule(pythonProject: Path, extra_target: String?) -> BuildScript {
         let hostPython: Path = .hostPython
         let pip3 = hostPython + "bin/pip3"
+        
+        let extra_target = if let extra_target {
+            "\(extra_target)/"
+        } else { "" }
+        
         return .init(
             script: .script("""
             
@@ -31,13 +36,13 @@ extension BuildScript {
             
             if [ "$EFFECTIVE_PLATFORM_NAME" = "-iphonesimulator" ]; then
                 echo "Installing App module for iOS Simulator"
-                $PIP3 install $APP_SRC $PIP_ARGS -t "$PROJECT_DIR/site_packages/iphonesimulator/"
+                $PIP3 install $APP_SRC $PIP_ARGS -t "$PROJECT_DIR/\(extra_target)site_packages/iphonesimulator/"
             elif [ "$EFFECTIVE_PLATFORM_NAME" = "-iphoneos" ]; then
                 echo "Installing App module for iOS"
-                $PIP3 install $APP_SRC $PIP_ARGS -t "$PROJECT_DIR/site_packages/iphoneos/" 
+                $PIP3 install $APP_SRC $PIP_ARGS -t "$PROJECT_DIR/\(extra_target)site_packages/iphoneos/" 
             else
                 echo "Installing App module for macOS"
-                $PIP3 install $APP_SRC $PIP_ARGS -t "$PROJECT_DIR/site_packages/macos/" 
+                $PIP3 install $APP_SRC $PIP_ARGS -t "$PROJECT_DIR/\(extra_target)site_packages/macos/" 
             fi
             """),
             name: "Install App Module"
@@ -48,7 +53,7 @@ extension BuildScript {
     //    else
     //        echo "single arch pip wheel"
     //        fi
-    static func installAppWheelModule(name: String) -> BuildScript {
+    static func installAppWheelModule(name: String, extra_target: String?) -> BuildScript {
         let hostPython: Path = .hostPython
         let pip3 = hostPython + "bin/pip3"
         let pip_base = """
@@ -68,6 +73,10 @@ extension BuildScript {
         """
         let os_min = "ios_13_0"
         
+        let extra_target = if let extra_target {
+            "\(extra_target)/"
+        } else { "" }
+        
         return .init(
             script: .script("""
             
@@ -77,7 +86,7 @@ extension BuildScript {
             
             if [ "$EFFECTIVE_PLATFORM_NAME" = "-iphonesimulator" ]; then
                 echo "Installing App module for iOS Simulator"
-                SITE="$PROJECT_DIR/site_packages/iphonesimulator/"
+                SITE="$PROJECT_DIR/\(extra_target)site_packages/iphonesimulator/"
                 if [ "$ARCHS" = "x86_64" ]; then
                     PLATFORM_ARCH=\(os_min)_x86_64_iphonesimulator
                 else
@@ -86,11 +95,11 @@ extension BuildScript {
                 PIP_BASE="\(pip_base)"
             elif [ "$EFFECTIVE_PLATFORM_NAME" = "-iphoneos" ]; then
                 echo "Installing App module for iOS"
-                SITE="$PROJECT_DIR/site_packages/iphoneos/"
+                SITE="$PROJECT_DIR/\(extra_target)site_packages/iphoneos/"
                 PIP_BASE="\(pip_base)"
             else
                 echo "Installing App module for macOS"
-                SITE="$PROJECT_DIR/site_packages/macos/"
+                SITE="$PROJECT_DIR/\(extra_target)site_packages/macos/"
                 PIP_BASE="\(pip_base_macos)"
             fi
             
@@ -103,56 +112,25 @@ extension BuildScript {
         )
     }
     
-    static func installPyModules(pythonProject: Path) -> BuildScript {
+    static func installPyModules(pythonProject: Path, extra_target: String?) -> BuildScript {
         .init(
-            script: .script(.installPyModulesMultiPlatform(pythonProject: pythonProject)),
+            script: .script(.installPyModulesMultiPlatform(pythonProject: pythonProject, extra_target: extra_target)),
             name: "Install target specific Python modules"
         )
     }
     
-    static func installPyModulesIphoneOS(pythonProject: Path) -> BuildScript {
-        .init(
-            script: .script("""
-            set -e
-            
-            PYTHON="$PROJECT_DIR/python3"
-            
-            mkdir -p "$CODESIGNING_FOLDER_PATH/python/lib"
-            if [ "$EFFECTIVE_PLATFORM_NAME" = "-iphonesimulator" ]; then
-                echo "Installing Python modules for iOS Simulator"
-                rsync -au --delete "$PROJECT_DIR/Support/ios-arm64_x86_64-simulator/lib/" "$CODESIGNING_FOLDER_PATH/python/lib/" 
-                rsync -au --delete "$PROJECT_DIR/site_packages.iphonesimulator/" "$CODESIGNING_FOLDER_PATH/site_packages" 
-            else
-                echo "Installing Python modules for iOS Device"
-                rsync -au --delete "$PROJECT_DIR/Support/ios-arm64/lib/" "$CODESIGNING_FOLDER_PATH/python/lib" 
-                rsync -au --delete "$PROJECT_DIR/site_packages.iphoneos/" "$CODESIGNING_FOLDER_PATH/site_packages" 
-            fi
-            
-            PY_APP="$CODESIGNING_FOLDER_PATH/app"
-            rsync -au --delete "\(pythonProject)/" $PY_APP
-            #$PYTHON -m compileall -f -b -o2 $PY_APP
-            #find $PY_APP -regex '.*\\.py' -delete
-            
-            PY_SITE="$CODESIGNING_FOLDER_PATH/site_packages"
-            #$PYTHON -m compileall -f -b -o2 $PY_SITE
-            #find $PY_SITE -regex '.*\\.py' -print -delete
-            #find $PY_SITE -name '__pycache__' -type d -print -exec rm -r {} + -depth
-            
-            """),
-            name: "Install target specific Python modules"
-        )
-    }
     
-    static func signPythonBinary() -> BuildScript {
+    
+    static func signPythonBinary(sub_version: Int) -> BuildScript {
         .init(
-            script: .script(.signPythonBinaryMultiPlatform()),
+            script: .script(.signPythonBinaryMultiPlatform(sub_version: sub_version)),
             name: "Sign Python Binary Modules"
         )
     }
     
-    static func signPythonBinaryIphoneOS() -> BuildScript {
+    static func signPythonBinaryIphoneOS(sub_version: Int) -> BuildScript {
         .init(
-            script: .script(.signPythonBinaryIPhoneOS()),
+            script: .script(.signPythonBinaryIPhoneOS(sub_version: sub_version)),
             name: "Sign Python Binary Modules"
         )
     }
@@ -179,9 +157,9 @@ extension String {
     
     fileprivate static var ios_condition: Self { "[ \"$EFFECTIVE_PLATFORM_NAME\" = \"-iphonesimulator\" ] || [ \"$EFFECTIVE_PLATFORM_NAME\" = \"-iphoneos\" ]"}
     
-    fileprivate static func signPythonBinaryMultiPlatform() -> Self {
+    fileprivate static func signPythonBinaryMultiPlatform(sub_version: Int) -> Self {
         
-        let ios_string = signPythonBinaryIPhoneOS_Base().replacing("\n", with: "\n\t")
+        let ios_string = signPythonBinaryIPhoneOS_Base(sub_version: sub_version).replacing("\n", with: "\n\t")
         let macos_string = signPythonBinaryMacOS_Base().replacing("\n", with: "\n\t")
         return """
         set -e
@@ -214,14 +192,14 @@ extension String {
         """
     }
     
-    fileprivate static func signPythonBinaryIPhoneOS() -> Self {
+    fileprivate static func signPythonBinaryIPhoneOS(sub_version: Int) -> Self {
         """
         set -e
-        \(signPythonBinaryIPhoneOS_Base())
+        \(signPythonBinaryIPhoneOS_Base(sub_version: sub_version))
         """
     }
     
-    fileprivate static func signPythonBinaryIPhoneOS_Base() -> Self {
+    fileprivate static func signPythonBinaryIPhoneOS_Base(sub_version: Int) -> Self {
             """
             install_dylib () {
                 INSTALL_BASE=$1
@@ -259,8 +237,8 @@ extension String {
             }
             
             echo "Install standard library extension modules..."
-            find "$CODESIGNING_FOLDER_PATH/python/lib/python3.11/lib-dynload" -name "*.so" | while read FULL_EXT; do
-                install_dylib python/lib/python3.11/lib-dynload/ "$FULL_EXT"
+            find "$CODESIGNING_FOLDER_PATH/python/lib/python3.\(sub_version)/lib-dynload" -name "*.so" | while read FULL_EXT; do
+                install_dylib python/lib/python3.\(sub_version)/lib-dynload/ "$FULL_EXT"
             done
             echo "Install app package extension modules..."
             find "$CODESIGNING_FOLDER_PATH/site_packages" -name "*.so" | while read FULL_EXT; do
@@ -293,8 +271,8 @@ extension String {
         )
     }
     
-    static func installPyModulesMultiPlatform(pythonProject: Path) -> Self {
-        let ios_string = installPyModulesIphoneOS_Base(pythonProject: pythonProject).replacing("\n", with: "\n\t")
+    static func installPyModulesMultiPlatform(pythonProject: Path, extra_target: String?) -> Self {
+        let ios_string = installPyModulesIphoneOS_Base(pythonProject: pythonProject, extra_target: extra_target).replacing("\n", with: "\n\t")
         let macos_string = installPyModulesMacOS_Base(pythonProject: pythonProject).replacing("\n", with: "\n\t")
         return """
         set -e
@@ -328,20 +306,24 @@ extension String {
         """
     }
     
-    static func installPyModulesIphoneOS_Base(pythonProject: Path) -> Self {
-            """
-            mkdir -p "$CODESIGNING_FOLDER_PATH/python/lib"
-            if [ "$EFFECTIVE_PLATFORM_NAME" = "-iphonesimulator" ]; then
-                echo "Installing Python modules for iOS Simulator"
-                rsync -au --delete "$PROJECT_DIR/Support/ios-arm64_x86_64-simulator/lib/" "$CODESIGNING_FOLDER_PATH/python/lib/" 
-                rsync -au --delete "$PROJECT_DIR/site_packages/iphonesimulator/" "$CODESIGNING_FOLDER_PATH/site_packages" 
-            else
-                echo "Installing Python modules for iOS Device"
-                rsync -au --delete "$PROJECT_DIR/Support/ios-arm64/lib/" "$CODESIGNING_FOLDER_PATH/python/lib" 
-                rsync -au --delete "$PROJECT_DIR/site_packages/iphoneos/" "$CODESIGNING_FOLDER_PATH/site_packages" 
-            fi
-            rsync -au --delete "$PROJECT_DIR/app/" "$CODESIGNING_FOLDER_PATH/app"
-            """
+    static func installPyModulesIphoneOS_Base(pythonProject: Path, extra_target: String? = nil) -> Self {
+        let extra_target = if let extra_target {
+            "\(extra_target)/"
+        } else { "" }
+        
+        return """
+        mkdir -p "$CODESIGNING_FOLDER_PATH/python/lib"
+        if [ "$EFFECTIVE_PLATFORM_NAME" = "-iphonesimulator" ]; then
+            echo "Installing Python modules for iOS Simulator"
+            rsync -au --delete "$PROJECT_DIR/Support/ios-arm64_x86_64-simulator/lib/" "$CODESIGNING_FOLDER_PATH/python/lib/" 
+            rsync -au --delete "$PROJECT_DIR/\(extra_target)site_packages/iphonesimulator/" "$CODESIGNING_FOLDER_PATH/site_packages" 
+        else
+            echo "Installing Python modules for iOS Device"
+            rsync -au --delete "$PROJECT_DIR/Support/ios-arm64/lib/" "$CODESIGNING_FOLDER_PATH/python/lib" 
+            rsync -au --delete "$PROJECT_DIR/\(extra_target)site_packages/iphoneos/" "$CODESIGNING_FOLDER_PATH/site_packages" 
+        fi
+        rsync -au --delete "$PROJECT_DIR/app/" "$CODESIGNING_FOLDER_PATH/app"
+        """
     }
     
     static func installPyModulesMacOS_Base(pythonProject: Path) -> Self {

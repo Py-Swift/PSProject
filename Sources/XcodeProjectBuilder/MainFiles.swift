@@ -4,17 +4,17 @@
 //
 import Backends
 import Algorithms
-
+import ProjectSpec
 
 @MainActor
-func temp_main_file(backends: [any BackendProtocol]) throws -> String {
+func temp_main_file(backends: [any BackendProtocol], platform: ProjectSpec.Platform) throws -> String {
     let imports = try backends.flatMap { backend in
-        try backend.wrapper_imports(platform: .iOS).flatMap { imp in
+        try backend.wrapper_imports(platform: platform).flatMap { imp in
             imp.libraries.map(\.description)
         }
     }
     let modules = try backends.flatMap { backend in
-        try backend.wrapper_imports(platform: .iOS).flatMap { imp in
+        try backend.wrapper_imports(platform: platform).flatMap { imp in
             imp.modules.map(\.description)
         }
     }

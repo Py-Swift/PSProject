@@ -88,7 +88,8 @@ extension Validation {
         //let gil = PyGILState_Ensure()
         let py_backend = await PyFrameworkBackend()
         
-        try await py_backend.do_install(support: .ps_support, platform: .auto)
+        try await py_backend.do_install(support: .ps_support, platform: .iOS)
+        try await py_backend.do_install(support: .ps_support, platform: .macOS)
         
         //PyGILState_Release(gil)
     }

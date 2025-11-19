@@ -19,10 +19,11 @@ public final class XcodeProjectBuilder {
     let workingDir: Path
     
     var project: Project
+    let pyproject: PyProjectToml
     
-    
-    init(project: Project) {
+    init(project: Project, pyproject: PyProjectToml) {
         self.project = project
+        self.pyproject = pyproject
         workingDir = project.basePath
     }
     
@@ -46,7 +47,7 @@ public final class XcodeProjectBuilder {
             toml: pyproject,
             toml_table: .init(string: .init(contentsOf: pyproject_toml.url, encoding: .utf8))
         )
-        let xcode_proj = Self.init(project: project)
+        let xcode_proj = Self.init(project: project, pyproject: pyproject)
         
         try await xcode_proj.createStructure()
         try await xcode_proj.project.generate(open: open)
@@ -61,7 +62,7 @@ public final class XcodeProjectBuilder {
         
         try await copyPythonLibs()
         
-        try await copyAppFiles_iOS()
+        try await copyAppFiles()
         
         try await handleSwiftFiles()
     }
@@ -76,30 +77,53 @@ extension XcodeProjectBuilder {
     
     private func createRootFolders() async throws {
         
-        try? (workingDir + "app").mkpath(ignore: true)
-        let support = workingDir + "Support"
-        try support.mkpath(ignore: true)
+        func rootFolders(root: Path, main_target: Bool) async throws {
+            
+            if main_target {
+                try? (root + "app").mkpath(ignore: true)
+                let support = root + "Support"
+                try support.mkpath(ignore: true)
+                
+                let dylib_plist = support + "dylib-Info-template.plist"
+                try dylib_plist.write(stdlib_plist(), encoding: .utf8)
+            } else {
+                if !root.exists { try root.mkdir() }
+                let dylib_plist = root + "dylib-Info-template.plist"
+                try dylib_plist.write(stdlib_plist(), encoding: .utf8)
+            }
+            
+            let sources = root + "Sources"
+            
+            let ios_sources = sources + "IphoneOS"
+            try ios_sources.mkpath(ignore: true)
+            
+            let macos_sources = sources + "MacOS"
+            try macos_sources.mkpath(ignore: true)
+            
+            if main_target {
+                let shared_sources = sources + "Shared"
+                try shared_sources.mkpath(ignore: true)
+            }
+            
+            try await createSitePackages(root: root)
+        }
         
-        let dylib_plist = support + "dylib-Info-template.plist"
-        try dylib_plist.write(stdlib_plist(), encoding: .utf8)
+        try await rootFolders(
+            root: workingDir,
+            main_target: true
+        )
         
-        let sources = workingDir + "Sources"
-        
-        let ios_sources = sources + "IphoneOS"
-        try ios_sources.mkpath(ignore: true)
-        
-        let macos_sources = sources + "MacOS"
-        try macos_sources.mkpath(ignore: true)
-        
-        let shared_sources = sources + "Shared"
-        try shared_sources.mkpath(ignore: true)
-        
-        try await createSitePackages()
+        for target in project.project_targets.filter({$0.extra_target != nil}) {
+            try await rootFolders(
+                root: target.workingDir,
+                main_target: false
+            )
+        }
     }
     
     
-    private func createSitePackages() async throws {
-        let site_root = workingDir + "site_packages"
+    private func createSitePackages(root: Path) async throws {
+        let site_root = root + "site_packages"
         try site_root.mkpath(ignore: true)
         try (site_root + "iphoneos").mkdir(ignore: true)
         try (site_root + "iphonesimulator").mkdir(ignore: true)
@@ -112,10 +136,22 @@ extension XcodeProjectBuilder {
         //try Validation.support()
         //try await Validation.supportPythonFramework()
         
-        for backend in project.backends {
+        var backends = project.backends
+        for extra_target in project.project_targets.compactMap(\.extra_target) {
+            backends.append(contentsOf: try extra_target.loaded_backends())
+        }
+        
+        backends = backends.uniqued(on: \.name)
+        
+        for backend in backends {
             try await backend.do_install(support: support, platform: .auto)
         }
         
+//        for extra_target in project.project_targets.compactMap(\.extra_target) {
+//            for backend in try extra_target.loaded_backends() {
+//                try await backend.do_install(support: support, platform: .auto)
+//            }
+//        }
     }
     
     private func copyPythonLibs() async throws {
@@ -132,14 +168,18 @@ extension XcodeProjectBuilder {
                         try? lib.copy(support + lib.lastComponent)
                     }
                 case .macOS:
-                    try? (python_fw + "macos-arm64_x86_64").copy(support + "macos-arm64_x86_64")
+                    let mac_support = support + "macos-arm64_x86_64"
+                    try? (python_fw + "macos-arm64_x86_64").copy(mac_support)
+                    let mac3_13 = mac_support + "Python.framework/Versions/3.13"
+                    try? (mac3_13 + "lib").copy(mac_support + "lib")
+                    try? (mac3_13 + "include").copy(mac_support + "include")
                 default:
                     fatalError("\(target) not implemented")
             }
         }
     }
     
-    private func copyAppFiles_iOS() async throws {
+    private func copyAppFiles() async throws {
         let appFiles = try await getKivyAppFiles()
         
         
@@ -158,28 +198,50 @@ extension XcodeProjectBuilder {
                 }
             
         }
+        
+        if project.toml_psproject.copy__main__py {
+            let app_dir = project.basePath + "app"
+            let app_src = pyproject.app_src(root: .current)
+            let fn = "__main__.py"
+            try? (app_src + fn).copy(app_dir + fn )
+        }
     }
     
     private func handleSwiftFiles() async throws {
-        let backends = project.backends
-        for target in project.platforms {
-            print(Self.self, "handleSwiftFiles", target)
-            let sourcesPath = workingDir + "Sources"
+        
+        func createMain(target: Platform, root: Path, backends: [any BackendProtocol]) throws {
+            let sourcesPath = root + "Sources"
             switch target {
                 case .iOS:
                     let mainFile = try temp_main_file(
-                        backends: backends
+                        backends: backends,
+                        platform: .iOS
                     )
                     try (sourcesPath + "IphoneOS/main.swift").write(mainFile)
                 case .macOS:
                     let mainFile = try temp_main_file(
-                        backends: backends
+                        backends: backends,
+                        platform: .macOS
                     )
-                    try (sourcesPath + "MacOS/Main.swift").write(mainFile)
+                    try (sourcesPath + "MacOS/main.swift").write(mainFile)
                 default: break
                     
             }
         }
+        
+        let backends = project.backends
+        let extra_targets = project.project_targets.filter({$0.extra_target != nil})
+        for target in project.platforms {
+            print(Self.self, "handleSwiftFiles", target)
+            try createMain(target: target, root: workingDir, backends: backends)
+            
+            for extra_target in extra_targets {
+                print(Self.self, "handleSwiftFiles extra target", target)
+                try createMain(target: target, root: extra_target.workingDir, backends: extra_target.extra_target?.loaded_backends() ?? [])
+            }
+        }
+        
+        
     }
     
     private func generateIconAsset(resourcesPath: Path, appFiles: Path) async throws {
@@ -189,7 +251,7 @@ extension XcodeProjectBuilder {
         let appiconset = dest + "AppIcon.appiconset"
         try? appiconset.mkpath()
         let iconsData = [IconDataItem].allIcons
-        let assetData = iconsData.filter({$0.idiom != .mac})
+        let assetData = iconsData//.filter({$0.idiom != .mac})
         //iconsData.filter({$0.idiom == .mac})
         
         let sizes: [CGFloat] = assetData.compactMap { Double($0.expected_size)! }
@@ -276,6 +338,10 @@ extension XcodeProjectBuilder {
             try Path.withTemporaryFolder { tmp in
                 // loads, modifies and save result as pyproject.toml in temp folder
                 // and temp folder now mimics an uv project directory
+                let wheels_dir = uv_abs + "wheels"
+                if wheels_dir.exists {
+                    try (tmp + "wheels").symlink(wheels_dir)
+                }
                 try Self.copyAndModifyUVProject(uv_abs, excludes: excludes)
                 reqs.append(
                     UVTool.export_requirements(uv_root: tmp, group: nil)

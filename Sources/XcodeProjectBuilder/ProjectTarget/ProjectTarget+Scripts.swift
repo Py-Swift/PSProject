@@ -22,14 +22,14 @@ extension XcodeProjectBuilder.ProjectTarget {
     
     public func postBuildScripts() async throws -> [ProjectSpec.BuildScript] {
         let appModule: ProjectSpec.BuildScript = if let cythonized = toml.tool?.psproject?.cythonized, cythonized {
-            .installAppWheelModule(name: toml.project.name)
+            .installAppWheelModule(name: toml.project.name, extra_target: extra_target?.name)
         } else {
-            .installAppModule(pythonProject: py_app)
+            .installAppModule(pythonProject: py_app, extra_target: extra_target?.name)
         }
         return [
             appModule,
-            .installPyModules(pythonProject: py_app),
-            .signPythonBinary()
+            .installPyModules(pythonProject: py_app, extra_target: extra_target?.name),
+            .signPythonBinary(sub_version: 13)
         ]
     }
 }

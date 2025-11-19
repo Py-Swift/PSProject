@@ -38,7 +38,7 @@ extension XcodeProjectBuilder {
             }
             
             
-            self.project_targets = [
+            var project_targets: [ProjectTarget] = [
                 .init(
                     name: name,
                     py_app: py_src,
@@ -48,6 +48,22 @@ extension XcodeProjectBuilder {
                     workingDir: basePath
                 )
             ]
+            
+            for extra in toml_psproject.extra_targets {
+                project_targets.append(
+                    .extraTarget(
+                        name: extra.name,
+                        py_app: py_src,
+                        platforms: platforms,
+                        toml: toml,
+                        toml_table: toml_table,
+                        workingDir: basePath,
+                        extra_target: extra
+                    )
+                )
+            }
+            
+            self.project_targets = project_targets
             self.toml_psproject = toml_psproject
             self.backends = try toml_psproject.loaded_backends()
         }
@@ -102,6 +118,8 @@ extension XcodeProjectBuilder.Project {
                 base[k] = v
             }
         }
+        
+        
         
         return base
     }

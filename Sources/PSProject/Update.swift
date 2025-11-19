@@ -11,6 +11,7 @@ import Backends
 import WheelBuilder
 import PipRepo
 import XcodeProjectBuilder
+import ProjectSpec
 
 extension PSProject {
     
@@ -28,8 +29,52 @@ extension PSProject {
         @MainActor
         static func updateSitePackages(uv: Path, reset: Bool) async throws {
             
-            
-            //let uv = uv ?? .current
+            func pipInstallReqs(psproject: Tool.PSProject, req_file: Path, root: Path, backends: [any BackendProtocol]) async throws {
+                let platforms = try await psproject.getXcodePlatforms(workingDir: root)
+                
+                let cplatforms = platforms.asChuckedTarget()
+                
+                for (t, plats) in cplatforms {
+                    
+                    var extra_index: [String] = []
+                    //if let psproject = toml.tool?.psproject {
+                        extra_index.append(contentsOf: psproject.extra_index.resolved_path(prefix: uv))
+                        switch t {
+                            case .iOS:
+                                if let ios = psproject.ios {
+                                    extra_index.append(contentsOf: ios.extra_index.resolved_path(prefix: uv))
+                                }
+                            case .macOS:
+                                if let macos = psproject.macos {
+                                    extra_index.append(contentsOf: macos.extra_index.resolved_path(prefix: uv))
+                                }
+                            default: fatalError()
+                        }
+                    //}
+                    print("root: \(root) - uv:\(uv)")
+                
+                    print()
+                    for platform in plats {
+                        let site_path = platform.getSiteFolder()
+                        if reset {
+                            try? site_path.delete()
+                            try? site_path.mkdir()
+                        }
+                        if t == .macOS {
+                            try await platform.pipInstallDesktop(requirements: req_file, extra_index: extra_index)
+                        } else {
+                            try await platform.pipInstall(requirements: req_file, extra_index: extra_index)
+                        }
+                        
+                        
+                        //
+                        for backend in backends {
+                            try await backend.copy_to_site_packages(site_path: site_path, platform: platform.xcode_target, py_platform: platform.wheel_platform)
+                        }
+                        
+                    }
+                }
+            }
             
             let toml_path = (uv.absolute() + "pyproject.toml")
             let toml = try toml_path.loadPyProjectToml()
@@ -38,10 +83,10 @@ extension PSProject {
                 fatalError("tool.psproject in pyproject.toml not found")
             }
             
-            let workingDir = uv + "project_dist/xcode"
-            let platforms = try await psproject.getXcodePlatforms(workingDir: workingDir)
             
-            let cplatforms = platforms.asChuckedTarget()
+            
+            let workingDir = uv + "project_dist/xcode"
+            
             
             let backends = try psproject.loaded_backends()
             
@@ -49,47 +94,28 @@ extension PSProject {
             let req_file = workingDir + "requirements.txt"
             try req_file.write(req_string)
             
+            try await pipInstallReqs(
+                psproject: psproject,
+                req_file: req_file,
+                root: workingDir,
+                backends: backends
+            )
             
-            
-            for (t, plats) in cplatforms {
+            for extra_target in psproject.extra_targets {
+                let extra_backends = try extra_target.loaded_backends()
+                let extra_req_string = try! await XcodeProjectBuilder.generateReqFromUV(toml: toml, uv: uv, backends: extra_backends)
+                let extra_root = workingDir + extra_target.name
+                let extra_req_file = extra_root + "requirements.txt"
+                try extra_req_file.write(extra_req_string)
                 
-                var extra_index: [String] = []
-                if let psproject = toml.tool?.psproject {
-                    extra_index.append(contentsOf: psproject.extra_index.resolved_path(prefix: uv))
-                    switch t {
-                        case .iOS:
-                            if let ios = psproject.ios {
-                                extra_index.append(contentsOf: ios.extra_index.resolved_path(prefix: uv))
-                            }
-                        case .macOS:
-                            if let macos = psproject.macos {
-                                extra_index.append(contentsOf: macos.extra_index.resolved_path(prefix: uv))
-                            }
-                        default: fatalError()
-                    }
-                }
-                
-                for platform in plats {
-                    let site_path = platform.getSiteFolder()
-                    if reset {
-                        try? site_path.delete()
-                        try? site_path.mkdir()
-                    }
-                    if t == .macOS {
-                        try await platform.pipInstallDesktop(requirements: req_file, extra_index: extra_index)
-                    } else {
-                        try await platform.pipInstall(requirements: req_file, extra_index: extra_index)
-                    }
-                    
-                    
-                    
-                    for backend in backends {
-                        try await backend.copy_to_site_packages(site_path: site_path, platform: platform.xcode_target, py_platform: platform.wheel_platform)
-                    }
-                    
-                    
-                }
+                try await pipInstallReqs(
+                    psproject: psproject,
+                    req_file: extra_req_file,
+                    root: extra_root,
+                    backends: extra_backends
+                )
             }
+            
         }
         
         
@@ -284,7 +310,7 @@ extension Tool.PSProject {
         return plats
         
     }
-    }
+}
 
 
 extension [String] {

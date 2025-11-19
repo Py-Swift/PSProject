@@ -20,17 +20,35 @@ extension XcodeProjectBuilder {
         let toml: PyProjectToml
         let toml_table: TOMLTable
         let workingDir: Path
+        let extra_target: Tool.PSProject.ExtraTarget?
         
-        init(name: String, py_app: Path, platforms: [ProjectSpec.Platform], toml: PyProjectToml, toml_table: TOMLTable, workingDir: Path) {
+        var is_extra: Bool { extra_target != nil }
+        
+        init(name: String, py_app: Path, platforms: [ProjectSpec.Platform], toml: PyProjectToml, toml_table: TOMLTable, workingDir: Path, extra_target: Tool.PSProject.ExtraTarget? = nil) {
             self.name = name
             self.py_app = py_app
             self.platforms = platforms
             self.toml = toml
             self.toml_table = toml_table
             self.workingDir = workingDir
+            self.extra_target = extra_target
         }
         
-        
+        static func extraTarget(name: String, py_app: Path, platforms: [ProjectSpec.Platform], toml: PyProjectToml, toml_table: TOMLTable, workingDir: Path, extra_target: Tool.PSProject.ExtraTarget) -> ProjectTarget {
+            let new = ProjectTarget(
+                name: name,
+                py_app: py_app,
+                platforms: platforms,
+                toml: toml,
+                toml_table: toml_table,
+                workingDir: workingDir + name,
+                extra_target: extra_target
+            )
+            
+            
+            
+            return new
+        }
     }
 }
 
@@ -43,7 +61,7 @@ fileprivate extension XcodeProjectBuilder.ProjectTarget {
             ],
             "SWIFT_VERSION": "5.0",
             "ENABLE_BITCODE": false,
-            "PRODUCT_NAME": "$(PROJECT_NAME)"
+            //"PRODUCT_NAME": "$(PROJECT_NAME)"
         ]
         //        if let projectSpec = project?.projectSpecData {
         //            try loadBuildConfigKeys(from: projectSpec, keys: &configDict)
@@ -73,26 +91,37 @@ fileprivate extension XcodeProjectBuilder.ProjectTarget {
             return (current + "Sources")
         }
         
-        let sourcesPaths: [ProjectSpec.TargetSource] = platforms.compactMap { target_type in
+        var sourcesPaths: [ProjectSpec.TargetSource] = platforms.compactMap { target_type in
+            let group = if let extra_target {
+                "\(extra_target.name)/Sources"
+            } else {
+                "Sources"
+            }
             switch target_type {
                 case .iOS:
                     let target_src = sourcesPath + "IphoneOS"
-                    return .init(path: (target_src).string, group: "Sources", type: .group, destinationFilters: [.iOS])
+                    return .init(path: (target_src).string, group: group, type: .group, destinationFilters: [.iOS])
                 case .macOS:
                     let target_src = sourcesPath + "MacOS"
-                    return .init(path: (target_src).string, group: "Sources", type: .group, destinationFilters: [.macOS])
+                    return .init(path: (target_src).string, group: group, type: .group, destinationFilters: [.macOS])
                 default:
                     return nil
             }
-        } + [
-            .init(path: (sourcesPath + "Shared").string, group: "Sources", type: .group)
-        ]
+        }
+        if extra_target == nil {
+            sourcesPaths.append(.init(path: (sourcesPath + "Shared").string, group: "Sources", type: .group))
+        }
+        
         
         let target_group = workingDir.lastComponent
         //let res_group = single_target ? "Resources" : "\(target_group)/Resources"
         let res_group = "Resources"
         let support_group = (workingDir + "Support")
-        let dylib_plist = support_group + "dylib-Info-template.plist"
+        let dylib_plist = if is_extra {
+            workingDir + "dylib-Info-template.plist"
+        } else {
+            support_group + "dylib-Info-template.plist"
+        }
         
         var sources: [ProjectSpec.TargetSource] = [
             .init(path: "\(res_group)/Images.xcassets", group: res_group),
@@ -121,13 +150,24 @@ fileprivate extension XcodeProjectBuilder.ProjectTarget {
             
         ]
         if let tool = toml.tool, let project = tool.psproject{
-            let backends = try project.loaded_backends() 
-            for backend in backends {
-                for platform in self.platforms {
-                    let fws: [ProjectSpec.Dependency] = try await backend.target_dependencies(platform: platform)
-                    output.append(contentsOf: fws)
+            
+            if let extra_target {
+                for backend in try extra_target.loaded_backends() {
+                    for platform in self.platforms {
+                        let fws: [ProjectSpec.Dependency] = try await backend.target_dependencies(platform: platform)
+                        output.append(contentsOf: fws)
+                    }
+                }
+            } else {
+                let backends = try project.loaded_backends()
+                for backend in backends {
+                    for platform in self.platforms {
+                        let fws: [ProjectSpec.Dependency] = try await backend.target_dependencies(platform: platform)
+                        output.append(contentsOf: fws)
+                    }
                 }
             }
+            
         }
         
         

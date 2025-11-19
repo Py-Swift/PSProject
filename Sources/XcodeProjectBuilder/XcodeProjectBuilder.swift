@@ -146,12 +146,6 @@ extension XcodeProjectBuilder {
         for backend in backends {
             try await backend.do_install(support: support, platform: .auto)
         }
-        
-//        for extra_target in project.project_targets.compactMap(\.extra_target) {
-//            for backend in try extra_target.loaded_backends() {
-//                try await backend.do_install(support: support, platform: .auto)
-//            }
-//        }
     }
     
     private func copyPythonLibs() async throws {

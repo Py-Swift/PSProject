@@ -1,7 +1,7 @@
 # Mobile Platform Support Report
 
-**Generated:** 2025-11-19 15:57:32  
-**Packages Checked:** 100  
+**Generated:** 2025-11-19 15:59:45  
+**Packages Checked:** 50  
 **Dependency Checking:** Enabled
 
 ---
@@ -12,7 +12,8 @@ Packages with official iOS/Android wheels available on PyPI.
 
 | Package | Android | iOS | Dependencies |
 |---------|---------|-----|-------------|
-| `pillow` | ⚠️ Not available | ✅ Supported | ✅ All supported (0) |
+
+_No packages found._
 
 
 ## 🔧 PySwift Binary Wheels
@@ -25,9 +26,6 @@ Custom iOS/Android builds from [pypi.anaconda.org/pyswift/simple](https://pypi.a
 | `cryptography` | ⚠️ Not available | ✅ Supported | ✅ All supported (0) |
 | `cffi` | ⚠️ Not available | ✅ Supported | ✅ All supported (0) |
 | `pydantic-core` | ⚠️ Not available | ✅ Supported | ✅ All supported (0) |
-| `aiohttp` | ⚠️ Not available | ✅ Supported | ✅ All supported (0) |
-| `sqlalchemy` | 🐍 Pure Python | ✅ Supported | ✅ All supported (0) |
-| `greenlet` | ⚠️ Not available | ✅ Supported | ✅ All supported (0) |
 
 
 ## 🐍 Pure Python Packages
@@ -78,46 +76,6 @@ Packages that work on all platforms (no binary dependencies).
 | `tzdata` | 🐍 Pure Python | 🐍 Pure Python | ✅ All supported (0) |
 | `google-api-core` | 🐍 Pure Python | 🐍 Pure Python | ✅ All supported (0) |
 | `colorama` | 🐍 Pure Python | 🐍 Pure Python | ✅ All supported (0) |
-| `typing-inspection` | 🐍 Pure Python | 🐍 Pure Python | ✅ All supported (0) |
-| `awscli` | 🐍 Pure Python | 🐍 Pure Python | ✅ All supported (0) |
-| `httpx` | 🐍 Pure Python | 🐍 Pure Python | ✅ All supported (0) |
-| `yarl` | 🐍 Pure Python | 🐍 Pure Python | ✅ All supported (0) |
-| `multidict` | 🐍 Pure Python | 🐍 Pure Python | ✅ All supported (0) |
-| `google-auth` | 🐍 Pure Python | 🐍 Pure Python | ✅ All supported (0) |
-| `httpcore` | 🐍 Pure Python | 🐍 Pure Python | ✅ All supported (0) |
-| `pyasn1-modules` | 🐍 Pure Python | 🐍 Pure Python | ✅ All supported (0) |
-| `pytest` | 🐍 Pure Python | 🐍 Pure Python | ✅ All supported (0) |
-| `frozenlist` | 🐍 Pure Python | 🐍 Pure Python | ✅ All supported (0) |
-| `pyjwt` | 🐍 Pure Python | 🐍 Pure Python | ✅ All supported (0) |
-| `jsonschema` | 🐍 Pure Python | 🐍 Pure Python | ✅ All supported (0) |
-| `rich` | 🐍 Pure Python | 🐍 Pure Python | ✅ All supported (0) |
-| `googleapis-common-protos` | 🐍 Pure Python | 🐍 Pure Python | ✅ All supported (0) |
-| `virtualenv` | 🐍 Pure Python | 🐍 Pure Python | ✅ All supported (0) |
-| `aiosignal` | 🐍 Pure Python | 🐍 Pure Python | ✅ All supported (0) |
-| `propcache` | 🐍 Pure Python | 🐍 Pure Python | ✅ All supported (0) |
-| `iniconfig` | 🐍 Pure Python | 🐍 Pure Python | ✅ All supported (0) |
-| `wrapt` | 🐍 Pure Python | 🐍 Pure Python | ✅ All supported (0) |
-| `tqdm` | 🐍 Pure Python | 🐍 Pure Python | ✅ All supported (0) |
-| `python-dotenv` | 🐍 Pure Python | 🐍 Pure Python | ✅ All supported (0) |
-| `markdown-it-py` | 🐍 Pure Python | 🐍 Pure Python | ✅ All supported (0) |
-| `tomli` | 🐍 Pure Python | 🐍 Pure Python | ✅ All supported (0) |
-| `requests-oauthlib` | 🐍 Pure Python | 🐍 Pure Python | ✅ All supported (0) |
-| `mdurl` | 🐍 Pure Python | 🐍 Pure Python | ✅ All supported (0) |
-| `sqlalchemy` | 🐍 Pure Python | ✅ Supported | ✅ All supported (0) |
-| `aiohappyeyeballs` | 🐍 Pure Python | 🐍 Pure Python | ✅ All supported (0) |
-| `pathspec` | 🐍 Pure Python | 🐍 Pure Python | ✅ All supported (0) |
-| `openpyxl` | 🐍 Pure Python | 🐍 Pure Python | ✅ All supported (0) |
-| `et-xmlfile` | 🐍 Pure Python | 🐍 Pure Python | ✅ All supported (0) |
-| `pyparsing` | 🐍 Pure Python | 🐍 Pure Python | ✅ All supported (0) |
-| `referencing` | 🐍 Pure Python | 🐍 Pure Python | ✅ All supported (0) |
-| `jsonschema-specifications` | 🐍 Pure Python | 🐍 Pure Python | ✅ All supported (0) |
-| `beautifulsoup4` | 🐍 Pure Python | 🐍 Pure Python | ✅ All supported (0) |
-| `soupsieve` | 🐍 Pure Python | 🐍 Pure Python | ✅ All supported (0) |
-| `tomlkit` | 🐍 Pure Python | 🐍 Pure Python | ✅ All supported (0) |
-| `oauthlib` | 🐍 Pure Python | 🐍 Pure Python | ✅ All supported (0) |
-| `starlette` | 🐍 Pure Python | 🐍 Pure Python | ✅ All supported (0) |
-| `uvicorn` | 🐍 Pure Python | 🐍 Pure Python | ✅ All supported (0) |
-| `fastapi` | 🐍 Pure Python | 🐍 Pure Python | ✅ All supported (0) |
 
 
 ## ❌ Binary Packages Without Mobile Support
@@ -129,13 +87,6 @@ Packages with binary wheels but no iOS/Android support.
 | `pyyaml` | ⚠️ Not available | ⚠️ Not available | ✅ All supported (0) |
 | `pandas` | ⚠️ Not available | ⚠️ Not available | ✅ All supported (0) |
 | `markupsafe` | ⚠️ Not available | ⚠️ Not available | ✅ All supported (0) |
-| `pyarrow` | ⚠️ Not available | ⚠️ Not available | ✅ All supported (0) |
-| `grpcio` | ⚠️ Not available | ⚠️ Not available | ✅ All supported (0) |
-| `rpds-py` | ⚠️ Not available | ⚠️ Not available | ✅ All supported (0) |
-| `psutil` | ⚠️ Not available | ⚠️ Not available | ✅ All supported (0) |
-| `scipy` | ⚠️ Not available | ⚠️ Not available | ✅ All supported (0) |
-| `lxml` | ⚠️ Not available | ⚠️ Not available | ✅ All supported (0) |
-| `snowflake-connector-python` | ⚠️ Not available | ⚠️ Not available | ✅ All supported (0) |
 
 
 ## 📈 Summary Statistics
@@ -144,26 +95,26 @@ Packages with binary wheels but no iOS/Android support.
 
 | Category | Count | Percentage |
 |----------|-------|------------|
-| Official Binary Wheels (PyPI) | 1 | 1.0% |
-| PySwift Binary Wheels | 7 | 7.0% |
-| Pure Python | 83 | 83.0% |
-| Binary Without Mobile Support | 10 | 10.0% |
-| **Total** | **100** | **100%** |
+| Official Binary Wheels (PyPI) | 0 | 0.0% |
+| PySwift Binary Wheels | 4 | 8.0% |
+| Pure Python | 43 | 86.0% |
+| Binary Without Mobile Support | 3 | 6.0% |
+| **Total** | **50** | **100%** |
 
 ### Platform Support (Binary Wheels)
 
 | Platform | Count | Percentage |
 |----------|-------|------------|
-| Android Support | 0 / 8 | 0.0% |
-| iOS Support | 8 / 8 | 100.0% |
-| Both Platforms | 0 / 8 | 0.0% |
+| Android Support | 0 / 4 | 0.0% |
+| iOS Support | 4 / 4 | 100.0% |
+| Both Platforms | 0 / 4 | 0.0% |
 ### Dependency Analysis
 
 | Status | Count | Percentage |
 |--------|-------|------------|
-| All Dependencies Supported | 100 | 100.0% |
+| All Dependencies Supported | 50 | 100.0% |
 | Some Dependencies Unsupported | 0 | 0.0% |
-| **Total Packages with Dependencies** | **100** | **100%** |
+| **Total Packages with Dependencies** | **50** | **100%** |
 
 ---
 

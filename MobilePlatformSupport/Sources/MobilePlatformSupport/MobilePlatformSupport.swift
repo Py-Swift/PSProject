@@ -384,8 +384,8 @@ public class MobilePlatformSupport {
                 break
             }
             
-            // Use carriage return to update same line
-            print("\r[\(results.count + 1)/\(limit)] [\(index + 1)/\(packageNames.count)] \(packageName)", terminator: "")
+            // Use carriage return and clear line to update same line
+            print("\r\u{001B}[K[\(results.count + 1)/\(limit)] [\(index + 1)/\(packageNames.count)] \(packageName)", terminator: "")
             fflush(stdout)
             
             do {

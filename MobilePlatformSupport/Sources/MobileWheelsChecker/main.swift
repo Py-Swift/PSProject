@@ -37,8 +37,7 @@ struct MobileWheelsChecker {
         dateFormatter.dateFormat = "yyyy-MM-dd HH:mm:ss"
         let dateString = dateFormatter.string(from: timestamp)
         
-        dateFormatter.dateFormat = "yyyy-MM-dd-HHmmss"
-        let filename = "mobile-wheels-\(limit)-\(dateFormatter.string(from: timestamp)).md"
+        let filename = "mobile-wheels-results.md"
         
         var markdown = """
         # Mobile Platform Support Report

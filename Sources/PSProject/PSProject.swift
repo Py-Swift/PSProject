@@ -24,7 +24,7 @@ struct PSProject: AsyncParsableCommand {
                 Init.self,
                 Update.self,
                 HostPython.self,
-                Test.self
+                Template.self
             ]
         )
     }

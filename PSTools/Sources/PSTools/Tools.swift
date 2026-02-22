@@ -1,6 +1,7 @@
 
 
 import Foundation
+//import Subprocess
 @preconcurrency import PathKit
 
 
@@ -26,6 +27,8 @@ func pythonScript(_ script: String) -> String {
 	return output
 }
 
+
+
 @discardableResult
 public func gitClone(_ repo: String) -> String {
 	let task = Process()
@@ -47,7 +50,7 @@ func which_pip3() throws -> Path {
     let proc = Process()
     //proc.executableURL = .init(filePath: "/bin/zsh")
     proc.executableURL = .init(filePath: "/usr/bin/which")
-    proc.arguments = ["pip3.11"]
+    proc.arguments = ["pip3.13"]
     let pipe = Pipe()
     
     proc.standardOutput = pipe

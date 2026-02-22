@@ -13,6 +13,10 @@ public final class YamlBackend: Decodable {
     
     let backend: Backend
     
+    public var app_name: String?
+    
+    
+    
     struct Backend: Decodable {
         let name: String
         let backend_dependencies: [String]?
@@ -68,6 +72,7 @@ public final class YamlBackend: Decodable {
         
         let container = try decoder.singleValueContainer()
         self.backend = try container.decode(YamlBackend.Backend.self)
+        
     }
 }
 
@@ -126,6 +131,8 @@ extension YamlBackend.Script {
 }
 
 extension YamlBackend: BackendProtocol {
+    
+    
     
     public var name: String { backend.name }
     

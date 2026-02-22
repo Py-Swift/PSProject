@@ -20,8 +20,8 @@ public enum Validation {
         let hostpy = Path.hostPython
         let py_bin = hostpy + "bin/python3"
         let pip_bin = hostpy + "bin/pip3"
-        let py_lib = hostpy + "lib"
-        return py_bin.exists && pip_bin.exists && py_lib.exists
+        //let py_lib = hostpy + "lib"
+        return py_bin.exists && pip_bin.exists //&& py_lib.exists
     }
     
     public static func hostPython(_ ver: String? = nil) -> Bool {
@@ -36,7 +36,7 @@ public enum Validation {
         options: 
         * set fixed path by (recommended):
         
-            psproject host-python path "$(uv python find \(version))"
+            psproject host-python set-path "$(uv python find \(version))"
         
         * temporary set environment by:
             

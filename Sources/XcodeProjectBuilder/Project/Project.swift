@@ -21,6 +21,7 @@ extension XcodeProjectBuilder {
         let platforms: [ProjectSpec.Platform] //= [.iOS, .macOS]
         
         var project_targets: [ProjectTarget] = []
+        var app_extensions: [AppExtensionTarget] = []
         
         let toml_psproject: Tool.PSProject
         
@@ -49,18 +50,34 @@ extension XcodeProjectBuilder {
                 )
             ]
             
-            for extra in toml_psproject.extra_targets {
-                project_targets.append(
-                    .extraTarget(
-                        name: extra.name,
-                        py_app: py_src,
-                        platforms: platforms,
-                        toml: toml,
-                        toml_table: toml_table,
-                        workingDir: basePath,
-                        extra_target: extra
-                    )
-                )
+            for (name,extra) in toml_psproject.extra_targets {
+                switch extra.type {
+                    case .app:
+                        project_targets.append(
+                            .extraTarget(
+                                name: name,
+                                py_app: py_src,
+                                platforms: platforms,
+                                toml: toml,
+                                toml_table: toml_table,
+                                workingDir: basePath,
+                                extra_target: extra
+                            )
+                        )
+                    case .app_extension:
+                        app_extensions.append(
+                            .init(
+                                name: name,
+                                py_app: py_src,
+                                platforms: platforms,
+                                toml: toml,
+                                toml_table: toml_table,
+                                workingDir: basePath,
+                                extra_target: extra
+                            )
+                        )
+                }
+                
             }
             
             self.project_targets = project_targets
@@ -78,6 +95,9 @@ extension XcodeProjectBuilder.Project {
     fileprivate func targets() async throws -> [Target] {
         var output = [Target]()
         for t in project_targets {
+            output.append(try await t.export())
+        }
+        for t in app_extensions {
             output.append(try await t.export())
         }
         return output
@@ -119,6 +139,10 @@ extension XcodeProjectBuilder.Project {
             }
         }
         
+        for (k,v) in toml_psproject.swift_packages {
+            base[k] = try .init(jsonDictionary: v.json)
+            print(k, v.json)
+        }
         
         
         return base

@@ -80,3 +80,28 @@ extension PSProject.Wheels.Cache {
         }
     }
 }
+
+extension Tool.PSProject {
+    public func contextPlatforms(workingDir: Path) throws -> [any ContextProtocol] {
+        var plats: [any ContextProtocol] = []
+
+        if let ios {
+            plats.append(try PlatformContext(arch: Archs.Arm64(), sdk: SDKS.IphoneOS(), root: workingDir))
+            switch arch_info {
+                case .intel64:
+                    plats.append(try PlatformContext(arch: Archs.X86_64(), sdk: SDKS.IphoneSimulator(), root: workingDir))
+                case .arm64:
+                    plats.append(try PlatformContext(arch: Archs.Arm64(), sdk: SDKS.IphoneSimulator(), root: workingDir))
+                default: break
+            }
+        }
+
+        if let macos {
+
+        }
+
+        return plats
+    }
+
+
+}

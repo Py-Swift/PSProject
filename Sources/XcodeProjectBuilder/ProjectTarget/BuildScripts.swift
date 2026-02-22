@@ -230,10 +230,19 @@ extension String {
                 
                 echo "Installing binary for $FRAMEWORK_FOLDER/$FULL_MODULE_NAME" 
                 mv "$FULL_EXT" "$CODESIGNING_FOLDER_PATH/$FRAMEWORK_FOLDER/$FULL_MODULE_NAME"
+                
                 # Create a placeholder .fwork file where the .so was
                 echo "$FRAMEWORK_FOLDER/$FULL_MODULE_NAME" > ${FULL_EXT%.so}.fwork
+                
                 # Create a back reference to the .so file location in the framework
-                echo "${RELATIVE_EXT%.so}.fwork" > "$CODESIGNING_FOLDER_PATH/$FRAMEWORK_FOLDER/$FULL_MODULE_NAME.origin"     
+                echo "${RELATIVE_EXT%.so}.fwork" > "$CODESIGNING_FOLDER_PATH/$FRAMEWORK_FOLDER/$FULL_MODULE_NAME.origin"
+                
+                # Copy privacy manifest into framework if one exists alongside the .so
+                XCPRIVACY_FILE="$(dirname "$FULL_EXT")/$(echo $EXT | cut -d '.' -f 1).xcprivacy"
+                if [ -f "$XCPRIVACY_FILE" ]; then
+                echo "Copying privacy manifest for $FULL_MODULE_NAME"
+                cp "$XCPRIVACY_FILE" "$CODESIGNING_FOLDER_PATH/$FRAMEWORK_FOLDER/PrivacyInfo.xcprivacy"
+                fi
             }
             
             echo "Install standard library extension modules..."

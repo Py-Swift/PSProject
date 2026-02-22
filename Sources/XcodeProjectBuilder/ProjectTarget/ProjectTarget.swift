@@ -9,6 +9,9 @@ import XcodeGenKit
 import PyProjectToml
 import TOMLKit
 import Foundation
+import Backends
+
+
 
 extension XcodeProjectBuilder {
     public class ProjectTarget {
@@ -81,10 +84,10 @@ fileprivate extension XcodeProjectBuilder.ProjectTarget {
         [:]
     }
     
-    func sources() async throws -> [ProjectSpec.TargetSource] {
+    
+    
+    private func sources() async throws -> [ProjectSpec.TargetSource] {
         let current = workingDir
-        
-        
         
         var sourcesPath: Path {
             
@@ -92,6 +95,7 @@ fileprivate extension XcodeProjectBuilder.ProjectTarget {
         }
         
         var sourcesPaths: [ProjectSpec.TargetSource] = platforms.compactMap { target_type in
+            
             let group = if let extra_target {
                 "\(extra_target.name)/Sources"
             } else {
@@ -108,6 +112,8 @@ fileprivate extension XcodeProjectBuilder.ProjectTarget {
                     return nil
             }
         }
+        
+        
         if extra_target == nil {
             sourcesPaths.append(.init(path: (sourcesPath + "Shared").string, group: "Sources", type: .group))
         }
@@ -141,6 +147,9 @@ fileprivate extension XcodeProjectBuilder.ProjectTarget {
         return sources
     }
     
+    
+    
+    @MainActor
     func dependencies() async throws -> [ProjectSpec.Dependency] {
         
         var output: [ProjectSpec.Dependency] = [
@@ -158,6 +167,10 @@ fileprivate extension XcodeProjectBuilder.ProjectTarget {
                         output.append(contentsOf: fws)
                     }
                 }
+                
+               
+                
+                
             } else {
                 let backends = try project.loaded_backends()
                 for backend in backends {
@@ -170,6 +183,18 @@ fileprivate extension XcodeProjectBuilder.ProjectTarget {
             
         }
         
+        if
+            let pyswift = toml_table["tool"] ,
+            let project = pyswift["psproject"],
+            let deps = project["dependencies"]?.array
+        {
+            for dep in deps {
+                guard let package = dep["package"]?.table, let products = package["products"]?.array, let ref = package["reference"]?.string else { continue }
+                //fatalError(ref)
+                output.append(.init(type: .package(products: products.compactMap(\.string)), reference: ref))
+            }
+        }
+        
         
         return output
     }
@@ -180,24 +205,45 @@ fileprivate extension XcodeProjectBuilder.ProjectTarget {
         keys.merge(spec)
     }
     
+    @MainActor
     func info() async throws -> ProjectSpec.Plist {
         var mainkeys: [String:Any] = [:]
         
-        try loadBasePlistKeys(from: project_plist_keys, keys: &mainkeys)
-        
-        for platform in self.platforms {
-            for backend in try toml.backends() {
-                try await backend.plist_entries(plist: &mainkeys, platform: platform)
+        if extra_target?.type == .app_extension {
+            
+        } else {
+            try loadBasePlistKeys(from: project_plist_keys, keys: &mainkeys)
+            
+            for platform in self.platforms {
+                for backend in try toml.backends() {
+                    try await backend.plist_entries(plist: &mainkeys, platform: platform)
+                }
             }
         }
-        
-        if
-            let pyswift = toml_table["pyswift"] ,
-            let project = pyswift["project"],
-            let plist = project["plist"]?.table,
+        if let extra_target {
+            
+            if
+                let extra_name = extra_target.name,
+                let pyswift = toml_table["tool"] ,
+                let project = pyswift["psproject"],
+                let ext_target = project["extra_targets"]?[extra_name],
+                let plist = ext_target["info_plist"]?.table,
+                let plist_data = plist.convert(to: .json).data(using: .utf8),
+                let json = try JSONSerialization.jsonObject(with: plist_data) as? [String:Any]
+            {
+                print("tool.psproject.extra_targets", json)
+                mainkeys.merge(json)
+                return .init(path: "\(extra_name)/Info.plist", attributes: json)
+            }
+            
+        } else if
+            let pyswift = toml_table["tool"] ,
+            let project = pyswift["psproject"],
+            let plist = project["info_plist"]?.table,
             let plist_data = plist.convert(to: .json).data(using: .utf8),
             let json = try JSONSerialization.jsonObject(with: plist_data) as? [String:Any]
         {
+            print("tool.psproject.info_plist", json)
             mainkeys.merge(json)
         }
         
@@ -206,7 +252,17 @@ fileprivate extension XcodeProjectBuilder.ProjectTarget {
     }
     
     func entitlements() async throws -> ProjectSpec.Plist? {
-        nil
+        if
+            let pyswift = toml_table["tool"] ,
+            let project = pyswift["psproject"],
+            let plist = project["entitlements"]?.table,
+            let plist_data = plist.convert(to: .json).data(using: .utf8),
+            let json = try JSONSerialization.jsonObject(with: plist_data) as? [String:Any]
+        {
+            print("tool.psproject.entitlements", json)
+            return .init(path: "\(self.name).entitlements", attributes: json)
+        }
+        return nil
     }
     
     func attributes() async throws -> [String : Any] {

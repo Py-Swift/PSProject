@@ -17,7 +17,8 @@ let package = Package(
     dependencies: [
         .package(url: "https://github.com/kylef/PathKit", .upToNextMajor(from: "1.0.1")),
         .package(url: "https://github.com/LebJe/TOMLKit", .upToNextMajor(from: "0.6.0")),
-        .package(path: "./Backends"),
+        .package(path: "../Backends"),
+        .package(url: "https://github.com/Py-Swift/PSTools", branch: "master"),
         .package(url: "https://github.com/PerfectlySoft/Perfect-INIParser.git", from: "3.0.0"),
     ],
     targets: [
@@ -28,6 +29,7 @@ let package = Package(
             dependencies: [
                 "TOMLKit",
                 "PathKit",
+                "PSTools",
                 "Backends",
                 .product(name: "INIParser", package: "perfect-iniparser"),
             ]

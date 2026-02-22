@@ -5,12 +5,17 @@
 import Foundation
 import PathKit
 import ProjectSpec
-import PSTools
+//import PSTools
 
 public class SDL2Backend: BackendProtocol {
     
     public var name: String { "SDL2" }
     
+    public var app_name: String?
+    
+    init() {
+        
+    }
     
     
     public func frameworks() async throws -> [Path] {

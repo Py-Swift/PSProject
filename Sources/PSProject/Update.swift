@@ -101,10 +101,10 @@ extension PSProject {
                 backends: backends
             )
             
-            for extra_target in psproject.extra_targets {
+            for (extra_name, extra_target) in psproject.extra_targets {
                 let extra_backends = try extra_target.loaded_backends()
                 let extra_req_string = try! await XcodeProjectBuilder.generateReqFromUV(toml: toml, uv: uv, backends: extra_backends)
-                let extra_root = workingDir + extra_target.name
+                let extra_root = workingDir + extra_name
                 let extra_req_file = extra_root + "requirements.txt"
                 try extra_req_file.write(extra_req_string)
                 

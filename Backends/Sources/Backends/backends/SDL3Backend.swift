@@ -12,6 +12,11 @@ public class SDL3Backend: BackendProtocol {
     
     public var name: String { "SDL3" }
     
+    public var app_name: String?
+    
+    init() {
+        
+    }
     
     
     public func frameworks() async throws -> [Path] {

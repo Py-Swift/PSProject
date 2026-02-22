@@ -2,7 +2,7 @@
 //  Kivy3Launcher.swift
 //  Backends
 //
-import PSTools
+//import PSTools
 import PathKit
 import ProjectSpec
 
@@ -27,10 +27,10 @@ public final class Kivy3Launcher: SDL3Backend {
     
     public override var name: String { "Kivy3Launcher" }
     
-   
     public override init() {
         super.init()
     }
+    
     
     public override func exclude_dependencies() throws -> [String] {
         ["kivy.2", "kivy.3", "kivy==", "kivy>=", "kivy>"]

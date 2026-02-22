@@ -6,7 +6,7 @@
 //
 import PathKit
 import TOMLKit
-import Backends
+//import Backends
 //import PSBackend
 
 public final class PyProjectToml: Decodable {
@@ -18,8 +18,8 @@ public final class PyProjectToml: Decodable {
     public var root: Path?
     
     
-    private var backendsIsLoaded = false
-    private var loadedBackends: [any BackendProtocol] = []
+    public var backendsIsLoaded = false
+    //private var loadedBackends: [any BackendProtocol] = []
     
     enum CodingKeys: String, CodingKey {
         case project
@@ -46,15 +46,16 @@ public final class PyProjectToml: Decodable {
         root + "src/\(app_src_name)"
     }
     
-    public func backends() throws -> [any BackendProtocol] {
-        if backendsIsLoaded { return loadedBackends }
-        
-        if let psproject = tool?.psproject {
-            try psproject.loaded_backends()
-        }
-        backendsIsLoaded.toggle()
-        return loadedBackends
-    }
+//    @MainActor
+//    public func backends() throws -> [any BackendProtocol] {
+//        if backendsIsLoaded { return loadedBackends }
+//        
+//        if let psproject = tool?.psproject {
+//            try psproject.loaded_backends()
+//        }
+//        backendsIsLoaded.toggle()
+//        return loadedBackends
+//    }
     
 }
 

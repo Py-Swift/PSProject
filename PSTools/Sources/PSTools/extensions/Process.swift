@@ -5,6 +5,7 @@
 
 import Foundation
 import PathKit
+//import Subprocess
 
 extension Process {
     public var executablePath: Path? {
@@ -22,7 +23,7 @@ extension Process {
 
 extension Process {
     @discardableResult
-    public static func untar(url: Path) throws -> Int32 {
+    public static func untar(url: Path) throws {
         let targs = [
             "-xzvf", url.string
         ]
@@ -33,7 +34,9 @@ extension Process {
         
         try task.run()
         task.waitUntilExit()
-        return task.terminationStatus
+        //return task.terminationStatus
+        
+        
     }
     
     

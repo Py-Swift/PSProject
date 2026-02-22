@@ -5,15 +5,20 @@
 import Foundation
 import PathKit
 import TOMLKit
-import Backends
+//import Backends
 import PSTools
 
 
 extension PyProjectToml {
     public static func newToml(path: Path, uv_name: String?, cythonized: Bool) async throws  {
+        let pyproject = path + "pyproject.toml"
+        
+        if pyproject.exists {
+            try pyproject.delete()
+        }
         UVTool.Init(path: path.string, name: uv_name ?? path.lastComponent)
         //let name = name ?? path.lastComponent
-        let pyproject = path + "pyproject.toml"
+        
         var pyproject_text = try pyproject.read(.utf8)
         if cythonized {
             let tmp_toml = try TOMLTable(string: pyproject_text)
@@ -61,10 +66,23 @@ extension PyProjectToml {
         //let base = TomlTableHandler(toml: .init(table: try TOMLTable(string: pyproject_text)))
         
         let tool_string = tool_keys(path: path, cythonized: cythonized).convert(to: .toml, options: [
-            .indentArrayElements
+            .indentArrayElements,
         ])
         
-        pyproject_text = "\(pyproject_text)\n\(mainToml)\n\(tool_string)"
+        pyproject_text = """
+        \(pyproject_text)
+        \(mainToml)
+        
+        #### PSProject Configuration ####
+        
+        \(tool_string)
+        
+        \(pskeys_ios())
+        
+        \(pskeys_macos())
+        
+        \(pskeys_swift_packages())
+        """
         
         
         print("\n####################### pyproject.toml ###########################\n")
@@ -72,11 +90,18 @@ extension PyProjectToml {
             pyproject_text
         )
         print("\n##################################################################\n")
+        
         try pyproject.write(pyproject_text)
         try await prepare_project(path: path)
         if cythonized {
-            try (path + "setup.py").write(cythonized_setup_py)
-            try (path + "MANIFEST.in").write(cythonized_manifest_in)
+            
+            let setup_py = (path + "setup.py")
+            let menifest = (path + "MANIFEST.in")
+            if setup_py.exists && menifest.exists {
+                return
+            }
+            try setup_py.write(cythonized_setup_py)
+            try menifest.write(cythonized_manifest_in)
         }
     }
 }
@@ -96,6 +121,48 @@ extension PyProjectToml {
         return toml.table
     }
     
+    fileprivate static func toolBase<Value>(key: WritableKeyPath<TomlTableHandler, Value>, value: Value) -> TomlTableHandler {
+        let toml = TomlTableHandler()
+        var tool = TomlTableHandler()
+        tool[keyPath: key] = value
+        toml.tool = tool.table
+        return toml
+    }
+    
+    fileprivate static func psprojectBase<Value>(key: WritableKeyPath<TomlTableHandler, Value>, value: Value) -> TomlTableHandler {
+        var toml = TomlTableHandler()
+        toml[keyPath: key] = value
+        //toml[keyPath: KeyPath<TomlTableHandler, Value>]
+        return toolBase(key: \.psproject, value: toml )
+    }
+
+    fileprivate static func pskeys_ios() -> String {
+        let toml = TomlTableHandler()
+        toml.backends = TOMLArray()
+        toml.extra_index = [
+            "https://pypi.anaconda.org/beeware/simple",
+            "https://pypi.anaconda.org/pyswift/simple",
+            "https://pypi.anaconda.org/kivyschool/simple"
+        ]
+        
+        return psprojectBase(key: \.ios, value: toml).table.convert(to: .toml, options: .indentArrayElements)
+    }
+    
+    fileprivate static func pskeys_macos() -> String {
+        //return ""
+        let toml = TomlTableHandler()
+        toml.extra_index = TOMLArray()
+        
+        return psprojectBase(key: \.macos, value: toml).table.convert(to: .toml, options: .indentArrayElements)
+    }
+    
+    fileprivate static func pskeys_swift_packages() -> String {
+        //let toml = TomlTableHandler()
+        //toml.swift_packages = TOMLArray()
+        //return ""
+        return psprojectBase(key: \.swift_packages, value: TOMLTable()).table.convert(to: .toml, options: .indentArrayElements)
+    }
+    
     fileprivate static func psproject_keys(path: Path, cythonized: Bool) -> TOMLTable {
         let toml = TomlTableHandler()
         
@@ -106,26 +173,29 @@ extension PyProjectToml {
         toml.copy__main__py = true
         toml.backends = [String]()
         toml.extra_index = [String]()
-        toml.swift_packages = TOMLTable()
+        //toml.swift_packages = TOMLTable()
+        toml.info_plist = TOMLTable()
+        toml.entitlements = TOMLTable()
         
-        let toml_ios = TomlTableHandler()
-        toml_ios.backends = TOMLArray()
-        toml_ios.extra_index = [
-            "https://pypi.anaconda.org/beeware/simple",
-            "https://pypi.anaconda.org/pyswift/simple",
-            "https://pypi.anaconda.org/kivyschool/simple"
-        ]
-        toml_ios.info_plist = TOMLTable()
-        toml_ios.swift_packages = TOMLTable()
+//        let toml_ios = TomlTableHandler()
+//        toml_ios.backends = TOMLArray()
+//        toml_ios.extra_index = [
+//            "https://pypi.anaconda.org/beeware/simple",
+//            "https://pypi.anaconda.org/pyswift/simple",
+//            "https://pypi.anaconda.org/kivyschool/simple"
+//        ]
+        //toml_ios.info_plist = TOMLTable()
         
-        toml.ios = toml_ios
+        //toml_ios.swift_packages = TOMLTable()
         
-        let toml_macos = TomlTableHandler()
-        toml_macos.backends = TOMLArray()
-        toml_macos.extra_index = TOMLArray()
-        toml_macos.info_plist = TOMLTable()
-        toml_macos.swift_packages = TOMLTable()
-        toml.macos = toml_macos
+//        toml.ios = toml_ios
+//        
+//        let toml_macos = TomlTableHandler()
+//        //toml_macos.backends = TOMLArray()
+//        toml_macos.extra_index = TOMLArray()
+//        //toml_macos.info_plist = TOMLTable()
+//        //toml_macos.swift_packages = TOMLTable()
+//        toml.macos = toml_macos
         
         return toml.table
     }
@@ -140,6 +210,9 @@ extension PyProjectToml {
         let main_py = app_src + "__main__.py"
         let init_py = app_src + "__init__.py"
         
+        if app_py.exists && main_py.exists && init_py.exists {
+            return
+        }
         
         let app_string = """
             def main():
@@ -168,7 +241,10 @@ extension PyProjectToml {
 extension Dictionary where Key == String, Value == any TOMLValueConvertible {
     init(table: TOMLTable) {
         self = table.reduce([:], { partialResult, next in
-            partialResult.merged([next.0:next.1])
+            //partialResult.merged([next.0:next.1])
+            partialResult.merging([next.0:next.1]) { old, new in
+                new
+            }
         })
     }
 }

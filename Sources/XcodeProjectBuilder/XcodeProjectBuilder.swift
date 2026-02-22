@@ -38,6 +38,10 @@ public final class XcodeProjectBuilder {
         }
         //let proj_target = ProjectTarget()
         
+        for backend in try pyproject.backends() {
+            backend.app_name = psproject.app_name
+        }
+        
         let project = try Project(
             name: psproject.app_name ?? pyproject.project.name,
             basePath: uv + "project_dist/xcode",
@@ -77,35 +81,48 @@ extension XcodeProjectBuilder {
     
     private func createRootFolders() async throws {
         
-        func rootFolders(root: Path, main_target: Bool) async throws {
+        func rootFolders(root: Path, main_target: Bool, target_type: Tool.PSProject.ExtraTarget.TargetType = .app) async throws {
             
-            if main_target {
-                try? (root + "app").mkpath(ignore: true)
-                let support = root + "Support"
-                try support.mkpath(ignore: true)
-                
-                let dylib_plist = support + "dylib-Info-template.plist"
-                try dylib_plist.write(stdlib_plist(), encoding: .utf8)
-            } else {
-                if !root.exists { try root.mkdir() }
-                let dylib_plist = root + "dylib-Info-template.plist"
-                try dylib_plist.write(stdlib_plist(), encoding: .utf8)
+            
+            
+            switch target_type {
+                case .app:
+                    
+                    if main_target {
+                        try? (root + "app").mkpath(ignore: true)
+                        let support = root + "Support"
+                        try support.mkpath(ignore: true)
+                        
+                        let dylib_plist = support + "dylib-Info-template.plist"
+                        try dylib_plist.write(stdlib_plist(), encoding: .utf8)
+                    } else {
+                        if !root.exists { try root.mkdir() }
+                        let dylib_plist = root + "dylib-Info-template.plist"
+                        try dylib_plist.write(stdlib_plist(), encoding: .utf8)
+                    }
+                    
+                    let sources = root + "Sources"
+                    
+                    let ios_sources = sources + "IphoneOS"
+                    try ios_sources.mkpath(ignore: true)
+                    
+                    let macos_sources = sources + "MacOS"
+                    try macos_sources.mkpath(ignore: true)
+                    
+                    if main_target {
+                        let shared_sources = sources + "Shared"
+                        try shared_sources.mkpath(ignore: true)
+                    }
+                    try await createSitePackages(root: root)
+                case .app_extension:
+                    if !root.exists {
+                        try root.mkdir()
+                    }
             }
             
-            let sources = root + "Sources"
             
-            let ios_sources = sources + "IphoneOS"
-            try ios_sources.mkpath(ignore: true)
             
-            let macos_sources = sources + "MacOS"
-            try macos_sources.mkpath(ignore: true)
             
-            if main_target {
-                let shared_sources = sources + "Shared"
-                try shared_sources.mkpath(ignore: true)
-            }
-            
-            try await createSitePackages(root: root)
         }
         
         try await rootFolders(
@@ -113,6 +130,12 @@ extension XcodeProjectBuilder {
             main_target: true
         )
         
+        for target in project.app_extensions {
+            try await rootFolders(
+                root: target.workingDir,
+                main_target: false
+            )
+        }
         for target in project.project_targets.filter({$0.extra_target != nil}) {
             try await rootFolders(
                 root: target.workingDir,
@@ -206,19 +229,23 @@ extension XcodeProjectBuilder {
         
         func createMain(target: Platform, root: Path, backends: [any BackendProtocol]) throws {
             let sourcesPath = root + "Sources"
+            let fn = try backends
+                .filter({try $0.will_modify_main_swift()})
+                .compactMap({try $0.main_swift_name()})
+                .first ?? "main"
             switch target {
                 case .iOS:
                     let mainFile = try temp_main_file(
                         backends: backends,
                         platform: .iOS
                     )
-                    try (sourcesPath + "IphoneOS/main.swift").write(mainFile)
+                    try (sourcesPath + "IphoneOS/\(fn).swift").write(mainFile)
                 case .macOS:
                     let mainFile = try temp_main_file(
                         backends: backends,
                         platform: .macOS
                     )
-                    try (sourcesPath + "MacOS/main.swift").write(mainFile)
+                    try (sourcesPath + "MacOS/\(fn).swift").write(mainFile)
                 default: break
                     
             }
@@ -343,9 +370,9 @@ extension XcodeProjectBuilder {
                 )
                 
             }
-            if let ios_pips = toml.tool?.psproject?.dependencies?.pips {
-                reqs.append(contentsOf: ios_pips)
-            }
+//            if let ios_pips = toml.tool?.psproject?.dependencies?.pips {
+//                reqs.append(contentsOf: ios_pips)
+//            }
             
             let req_txt = reqs.joined(separator: "\n")
             print(req_txt)
@@ -356,9 +383,9 @@ extension XcodeProjectBuilder {
             reqs.append(
                 UVTool.export_requirements(uv_root: uv, group: nil)
             )
-            if let ios_pips = toml.tool?.psproject?.dependencies?.pips {
-                reqs.append(contentsOf: ios_pips)
-            }
+//            if let ios_pips = toml.tool?.psproject?.dependencies?.pips {
+//                reqs.append(contentsOf: ios_pips)
+//            }
             
             let req_txt = reqs.joined(separator: "\n")
             print(req_txt)

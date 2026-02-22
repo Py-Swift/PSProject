@@ -24,7 +24,7 @@ extension PSProject {
         
         func run() async throws {
             
-            if !Validation.hostPython() { return }
+            //if !Validation.hostPython() { return }
             
             let btoml: TOMLTable? = if let buildozer {
                 try BuildozerSpecReader(path: buildozer).export()

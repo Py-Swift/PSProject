@@ -17,6 +17,7 @@ let package = Package(
     dependencies: [
         .package(url: "https://github.com/kylef/PathKit", .upToNextMajor(from: "1.0.1")),
         .package(url: "https://github.com/yonaskolb/XcodeGen.git", from: "2.42.0"),
+        //.package(url: "https://github.com/swiftlang/swift-subprocess.git",.upToNextMajor(from: "0.2.1")),
     ],
     targets: [
         // Targets are the basic building blocks of a package, defining a module or a test suite.
@@ -26,6 +27,7 @@ let package = Package(
             dependencies: [
                 "PathKit",
                 .product(name: "ProjectSpec", package: "XcodeGen"),
+                //.product(name: "Subprocess", package: "swift-subprocess")
             ],
             swiftSettings: [.swiftLanguageMode(.v5)]
         ),

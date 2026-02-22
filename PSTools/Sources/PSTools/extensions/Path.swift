@@ -4,16 +4,21 @@
 //
 @preconcurrency import PathKit
 import Foundation
+//import Subprocess
 
 extension Path: @unchecked Swift.Sendable {}
 
+//extension Executable {
+//    public static var python3: Self { .path(.init(Path.python3.string)) }
+//    public static var pip3: Self { .path(.init(Path.python3.string)) }
+//}
 
 extension Path {
     public static var ps_shared: Self { "/Users/shared/psproject" }
     public static var ps_support: Self { ps_shared + "Support" }
     
     
-    public static var host_python: Self { ps_shared + "HostPython3"}
+    public static var host_python: Self { ps_shared + "hostpython3"}
     fileprivate static var host_python_bin: Self { ps_shared + "bin" }
     public static var python3: Self { host_python_bin + "python3" }
     public static var pip3: Self { host_python_bin + "pip3" }
@@ -34,6 +39,19 @@ public func getHostPython() -> Path {
         }
         return .init(host_python)
     }
+    
+    let local_path = Path.current + ".hostpython"
+    if local_path.exists, let _host_python = try? local_path.read(.utf8) {
+        let path = Path(_host_python)
+        if path.isFile {
+            let parent = path.parent()
+            if parent.lastComponent == "bin" {
+                return parent.parent()
+            }
+        }
+        return path
+    }
+    
     return .ps_shared + "hostpython3"
 }
 

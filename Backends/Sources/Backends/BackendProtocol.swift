@@ -14,6 +14,10 @@ public protocol BackendProtocol: AnyObject {
     
     var name: String { get }
     
+    var app_name: String? { get set }
+    
+    //init(app_name: String)
+    
     func url() async throws -> URL?
     
     func frameworks() async throws -> [Path]
@@ -29,6 +33,8 @@ public protocol BackendProtocol: AnyObject {
     func wrapper_imports(platform: ProjectSpec.Platform) throws -> [WrapperImporter]
     
     func will_modify_main_swift() throws -> Bool
+    
+    func main_swift_name() throws -> String?
     
     func modify_main_swift(libraries: [String], modules: [String], platform: ProjectSpec.Platform) throws -> [CodeBlock]
     
@@ -66,6 +72,8 @@ extension BackendProtocol {
     public func pip_install(_ pip: String, _ args: String...) async throws {
         PyTools.pipInstall(pip: pip, args)
     }
+    
+    public func main_swift_name() throws -> String? { nil }
 }
 
 

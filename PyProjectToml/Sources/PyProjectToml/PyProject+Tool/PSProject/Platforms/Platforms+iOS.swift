@@ -42,7 +42,7 @@ extension Tool.PSProject.Platforms {
         }
         
         public func get_project_root(root: Path) -> Path {
-            root + "platform_dists/iphone_macos/xcode"
+            root + "platform_dists/xcode"
         }
     }
 }

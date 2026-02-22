@@ -254,11 +254,9 @@ extension XcodeProjectBuilder {
         let backends = project.backends
         let extra_targets = project.project_targets.filter({$0.extra_target != nil})
         for target in project.platforms {
-            print(Self.self, "handleSwiftFiles", target)
             try createMain(target: target, root: workingDir, backends: backends)
             
             for extra_target in extra_targets {
-                print(Self.self, "handleSwiftFiles extra target", target)
                 try createMain(target: target, root: extra_target.workingDir, backends: extra_target.extra_target?.loaded_backends() ?? [])
             }
         }

@@ -1,0 +1,28 @@
+[build-system]
+requires = ["setuptools", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "psproject"
+version = "1.0.5"
+description = "Tool to create PySwiftKit based Apps"
+readme = "README.md"
+license = "MIT"
+requires-python = ">=3.9"
+classifiers = [
+    "Operating System :: MacOS :: MacOS X",
+    "Topic :: Software Development :: Build Tools",
+]
+
+[project.urls]
+Homepage = "https://github.com/Py-Swift/PSProject"
+Repository = "https://github.com/Py-Swift/PSProject"
+Issues = "https://github.com/Py-Swift/PSProject/issues"
+
+[tool.setuptools]
+py-modules = []
+
+[dependency-groups]
+dev = [
+    "setuptools>=82.0.0",
+]

@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "psproject"
-version = "1.0.6"
+version = "1.0.7"
 description = "Tool to create PySwiftKit based Apps"
 readme = "README.md"
 license = "MIT"

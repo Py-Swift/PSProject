@@ -2,54 +2,13 @@
 
 Tool to create PySwiftKit based Apps
 
-## Installation
-
-### Homebrew (Recommended)
-
-First, add the Homebrew tap:
-
-```bash
-brew tap PythonSwiftLink/tools
-```
-
-Then install PSProject:
-
-```bash
-brew install psproject
-```
-
-To upgrade PSProject:
-
-```bash
-brew update
-brew upgrade --formula psproject
-```
-
-### From Source
-
-Alternatively, you can build PSProject from source using Swift Package Manager.
-
-```bash
-git clone https://github.com/Py-Swift/PSProject
-cd psproject
-swift build -c release --disable-sandbox --product PSProject
-```
-intel
-```bash
-.build/x86_64-apple-macosx/release/PSProject
-```
-arm64
-```bash
-.build/arm64-apple-macosx/release/PSProject
-```
-## Usage
-
 ### Create a New Project
 
 First, create a new project which will generate a `pyproject.toml` file:
 
 ```bash
-psproject init HelloWorld
+#psproject init HelloWorld
+uv init --package HelloWorld --python 3.13.8
 ```
 
 Navigate to the new project directory:
@@ -64,20 +23,27 @@ Or open it in VS Code:
 code HelloWorld
 ```
 
+```bash
+uv add psproject --dev
+```
+psproject is part of the app development and should only be added in dev mode, which uv automatic enables by default.
+pips added in dev group, won't be included in the macos/ios site-packages
+
 ### Configure for Kivy
 
 The generated `pyproject.toml` will contain default configuration. To create a Kivy-based app, add Kivy to the project dependencies and configure the PSProject backends:
 
 ```toml
 [project]
-name = "helloworld"
-version = "0.1.0"
-description = "Add your description here"
-readme = "README.md"
-requires-python = ">=3.13"
+authors = [ { email = "foo@baz.com", name = "somebody" } ]
 dependencies = [
     "kivy"
 ]
+description = "Add your description here"
+name = "helloworld"
+readme = "README.md"
+requires-python = ">=3.13.8"
+version = "0.1.0"
 
 [tool.psproject]
 app_name = "HelloWorld"
@@ -86,15 +52,7 @@ backends = [
 ]
 cythonized = false
 extra_index = []
-pip_install_app = false
-
-[tool.psproject.ios]
-backends = []
-extra_index = [
-    "https://pypi.anaconda.org/beeware/simple",
-    "https://pypi.anaconda.org/pyswift/simple",
-    "https://pypi.anaconda.org/kivyschool/simple"
-]
+pip_install_app = true
 ```
 
 ### Create Xcode Project
@@ -102,7 +60,7 @@ extra_index = [
 Generate the Xcode project:
 
 ```bash
-psproject create xcode
+uv run psproject create xcode
 ```
 
 ### Update Site Packages
@@ -110,7 +68,7 @@ psproject create xcode
 To update the Xcode project's site-packages:
 
 ```bash
-psproject update site-packages
+uv run psproject update site-packages
 ```
 
 ## Additional Resources

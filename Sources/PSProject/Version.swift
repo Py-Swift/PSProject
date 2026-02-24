@@ -1,1 +1,1 @@
-public let LIBRARY_VERSION = "1.0.5"
+public let LIBRARY_VERSION = "1.0.7"

@@ -2,6 +2,7 @@
 //  Xcode.swift
 //  PSProject
 //
+import Foundation
 import ArgumentParser
 import PathKit
 import PSTools
@@ -30,7 +31,7 @@ extension PSProject.Create {
             
             let root = directory ?? .current
             try Validation.pyprojectExist(root: root)
-            if !Validation.hostPython() { return }
+            //if !Validation.hostPython() { return }
             try Validation.backends()
             try Validation.support()
             try await Validation.supportPythonFramework()
@@ -44,6 +45,16 @@ extension PSProject.Create {
                 if ios { targets.append(.iOS) }
                 if macos { targets.append(.macOS) }
             }
+            
+            var PATH = ProcessInfo.processInfo.environment["PATH"] ?? ""
+            
+            if arch_info == .arm64 {
+                PATH += ":/opt/homebrew/Cellar"
+            } else {
+                PATH += ":/usr/local/Cellar"
+            }
+            
+            setenv("PATH", PATH, 1)
             
             try await XcodeProjectBuilder.create(uv: root, targets: targets, open: open)
             

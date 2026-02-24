@@ -233,7 +233,7 @@ extension PSProject.Update {
             
             print(infoTitle(title: "Cythonize App Module"))
             
-            if !Validation.hostPython() { return }
+            //if !Validation.hostPython() { return }
             try Validation.backends()
                         
             try await PSProject.Update.cythonizeApp(uv: uv ?? .current)
@@ -256,7 +256,7 @@ extension PSProject.Update {
             
             print(infoTitle(title: "Updating Site-Packages"))
             
-            if !Validation.hostPython() { return }
+            //if !Validation.hostPython() { return }
             try Validation.backends()
             
             
@@ -281,7 +281,7 @@ extension PSProject.Update {
             
             print(infoTitle(title: "Updating Wheels Simple"))
             
-            if !Validation.hostPython() { return }
+            //if !Validation.hostPython() { return }
             try Validation.backends()
             
             

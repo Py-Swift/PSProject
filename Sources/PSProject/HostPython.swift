@@ -39,7 +39,7 @@ extension PSProject {
                 let current = Path.current
                 let xcode = current + "project_dist/xcode"
                 var python = python
-                
+                print(python)
                 if python.isFile {
                     let parent = python.parent()
                     if parent.lastComponent == "bin" {
@@ -50,7 +50,7 @@ extension PSProject {
                 let hostpython: Path = .ps_shared + "hostpython3"
                 //for path in [Path.p] {
                 if hostpython.exists { try? hostpython.delete() }
-                try? python.link(hostpython)
+                try? python.symlink(hostpython)
                 //}
                 
                 

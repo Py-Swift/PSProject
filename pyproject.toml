@@ -22,7 +22,27 @@ Issues = "https://github.com/Py-Swift/PSProject/issues"
 [tool.setuptools]
 py-modules = []
 
+[tool.cibuildwheel]
+build = ["cp313-macosx_*"]
+skip = ["*-manylinux*", "*-musllinux*", "*-win*"]
+
+[tool.cibuildwheel.macos]
+archs = ["x86_64", "arm64", "universal2"]
+
+[[tool.cibuildwheel.overrides]]
+select = "*-macosx_x86_64"
+environment = { PSPROJECT_ARCHS = "x86_64" }
+
+[[tool.cibuildwheel.overrides]]
+select = "*-macosx_arm64"
+environment = { PSPROJECT_ARCHS = "arm64" }
+
+[[tool.cibuildwheel.overrides]]
+select = "*-macosx_universal2"
+environment = { PSPROJECT_ARCHS = "x86_64 arm64" }
+
 [dependency-groups]
 dev = [
+    "cibuildwheel>=2.23.3",
     "setuptools>=82.0.0",
 ]

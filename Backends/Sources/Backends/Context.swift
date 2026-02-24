@@ -375,6 +375,34 @@ extension PlatformContext {
             "-r", requirements.string
         ])
         task.arguments = arguments
+        task.executablePath = .pip3
+        task.standardInput = nil
+        task.launch()
+        task.waitUntilExit()
+        
+    }
+    
+    public func pipInstall_old(requirements: Path, extra_index: [String]) async throws {
+        let task = Process()
+        
+        var arguments: [String] = [
+            "install",
+            "--disable-pip-version-check",
+            "--platform=\(wheel_platform)",
+            "--only-binary=:all:",
+            //"--abi=cp313-cp313"
+            "--python-version=313"
+        ]
+        
+        arguments.append(contentsOf: extra_index.map { index in
+            ["--extra-index-url", index]
+        }.flatMap(\.self))
+        
+        arguments.append(contentsOf: [
+            "--target", getSiteFolder().string,
+            "-r", requirements.string
+        ])
+        task.arguments = arguments
         task.executablePath = pip3
         task.standardInput = nil
         task.launch()

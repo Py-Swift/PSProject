@@ -29,52 +29,84 @@ extension PSProject {
         @MainActor
         static func updateSitePackages(uv: Path, reset: Bool) async throws {
             
-            func pipInstallReqs(psproject: Tool.PSProject, req_file: Path, root: Path, backends: [any BackendProtocol]) async throws {
+            func pipInstallReqs(psproject: Tool.PSProject, root: Path, backends: [any BackendProtocol]) async throws {
                 let platforms = try await psproject.getXcodePlatforms(workingDir: root)
                 
                 let cplatforms = platforms.asChuckedTarget()
                 
                 for (t, plats) in cplatforms {
                     
-                    var extra_index: [String] = []
-                    //if let psproject = toml.tool?.psproject {
-                        extra_index.append(contentsOf: psproject.extra_index.resolved_path(prefix: uv))
-                        switch t {
-                            case .iOS:
-                                if let ios = psproject.ios {
-                                    extra_index.append(contentsOf: ios.extra_index.resolved_path(prefix: uv))
-                                }
-                            case .macOS:
-                                if let macos = psproject.macos {
-                                    extra_index.append(contentsOf: macos.extra_index.resolved_path(prefix: uv))
-                                }
-                            default: fatalError()
-                        }
-                    //}
-                    print("root: \(root) - uv:\(uv)")
+//                    var extra_index: [String] = []
+//                    //if let psproject = toml.tool?.psproject {
+//                        extra_index.append(contentsOf: psproject.extra_index.resolved_path(prefix: uv))
+//                        switch t {
+//                            case .iOS:
+//                                if let ios = psproject.ios {
+//                                    extra_index.append(contentsOf: ios.extra_index.resolved_path(prefix: uv))
+//                                }
+//                            case .macOS:
+//                                if let macos = psproject.macos {
+//                                    extra_index.append(contentsOf: macos.extra_index.resolved_path(prefix: uv))
+//                                }
+//                            default: fatalError()
+//                        }
+//                    //}
+                    //print("root: \(root) - uv:\(uv)")
                 
-                    print()
+                    //print()
                     for platform in plats {
                         let site_path = platform.getSiteFolder()
                         if reset {
                             try? site_path.delete()
                             try? site_path.mkdir()
                         }
-                        if t == .macOS {
-                            try await platform.pipInstallDesktop(requirements: req_file, extra_index: extra_index)
-                        } else {
-                            try await platform.pipInstall(requirements: req_file, extra_index: extra_index)
+                        
+                        switch t {
+                            case .iOS:
+                                let py_platform: UVTool.PythonPlatform = switch platform.sdk.type {
+                                    case .iphoneos: .ios_arm64
+                                    case .iphonesimulator: switch platform.arch.name {
+                                        case "arm64": .ios_sim_arm64
+                                        default: .ios_sim_x86_64
+                                    }
+                                    case .macos: .ios_arm64
+                                }
+                                
+                                UVTool.pipInstall(
+                                    uv_root: uv.absolute(),
+                                    platform: py_platform,
+                                    dest: site_path
+                                )
+                                
+                            case .macOS:
+                                UVTool.pipInstall(
+                                    uv_root: uv.absolute(),
+                                    platform: .macos_x86_64,
+                                    dest: site_path
+                                )
+                            case .auto, .watchOS, .visionOS, .tvOS:
+                                break
                         }
+                        
+//                        if t == .macOS {
+//                            try await platform.pipInstallDesktop(requirements: req_file, extra_index: extra_index)
+//                        } else {
+//                            
+//                            try await platform.pipInstall(requirements: req_file, extra_index: extra_index)
+//                        }
                         
                         
                         //
-                        for backend in backends {
-                            try await backend.copy_to_site_packages(site_path: site_path, platform: platform.xcode_target, py_platform: platform.wheel_platform)
-                        }
+//                        for backend in backends {
+//                            try await backend.copy_to_site_packages(site_path: site_path, platform: platform.xcode_target, py_platform: platform.wheel_platform)
+//                        }
                         
                     }
                 }
             }
+            
+            
+            
             
             let toml_path = (uv.absolute() + "pyproject.toml")
             let toml = try toml_path.loadPyProjectToml()
@@ -90,27 +122,26 @@ extension PSProject {
             
             let backends = try psproject.loaded_backends()
             
-            let req_string = try! await XcodeProjectBuilder.generateReqFromUV(toml: toml, uv: uv, backends: backends)
-            let req_file = workingDir + "requirements.txt"
-            try req_file.write(req_string)
+//            let req_string = try! await XcodeProjectBuilder.generateReqFromUV(toml: toml, uv: uv, backends: backends)
+//            let req_file = workingDir + "requirements.txt"
+//            try req_file.write(req_string)
             
             try await pipInstallReqs(
                 psproject: psproject,
-                req_file: req_file,
                 root: workingDir,
                 backends: backends
             )
             
             for (extra_name, extra_target) in psproject.extra_targets {
                 let extra_backends = try extra_target.loaded_backends()
-                let extra_req_string = try! await XcodeProjectBuilder.generateReqFromUV(toml: toml, uv: uv, backends: extra_backends)
+                //let extra_req_string = try! await XcodeProjectBuilder.generateReqFromUV(toml: toml, uv: uv, backends: extra_backends)
                 let extra_root = workingDir + extra_name
                 let extra_req_file = extra_root + "requirements.txt"
-                try extra_req_file.write(extra_req_string)
+                //try extra_req_file.write(extra_req_string)
                 
                 try await pipInstallReqs(
                     psproject: psproject,
-                    req_file: extra_req_file,
+                    //req_file: extra_req_file,
                     root: extra_root,
                     backends: extra_backends
                 )

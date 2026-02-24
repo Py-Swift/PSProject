@@ -10,16 +10,15 @@ import PSTools
 
 
 extension PyProjectToml {
-    public static func newToml(path: Path, uv_name: String?, cythonized: Bool) async throws  {
+    public static func newToml(path: Path, uv_name: String?, cythonized: Bool, executedByUV: Bool) async throws  {
         let pyproject = path + "pyproject.toml"
         
-        if pyproject.exists {
-            try pyproject.delete()
+        if !pyproject.exists {
+            UVTool.Init(path: path.string, name: uv_name ?? path.lastComponent)
         }
-        UVTool.Init(path: path.string, name: uv_name ?? path.lastComponent)
-        //let name = name ?? path.lastComponent
-        
         var pyproject_text = try pyproject.read(.utf8)
+        
+        
         if cythonized {
             let tmp_toml = try TOMLTable(string: pyproject_text)
             let build_system = TOMLTable()
@@ -43,22 +42,34 @@ extension PyProjectToml {
         }
         
         
+        let pyprojectToml = try TOMLTable(string: pyproject_text)
         
-        let mainToml = TOMLTable()
-        let dep_groups = TOMLTable()
+        let mainToml =  TOMLTable()
+        let dep_groups = pyprojectToml["dependency-groups"]?.table ?? TOMLTable()
+        
         dep_groups["iphoneos"] = TOMLArray()
-        
-        
-        
-        
         if cythonized {
-            
             dep_groups["dev"] =  ["cython"]
-            
         }
         
-        mainToml["dependency-groups"] = dep_groups
+        //let tool = try? TOMLTable(string: pyproject_text)
+        pyprojectToml["dependency-groups"] = dep_groups
         
+        //mainToml["dependency-groups"] = dep_groups
+        
+        
+        if let pp_table = try? TOMLTable(string: pyproject_text), let tool = pp_table["tool"]?.table {
+            if tool.contains(key: "psproject") { return }
+        }
+        
+        let extra_index_url = """
+        [tool.uv.pip]
+        extra-index-url = [
+            "https://pypi.anaconda.org/beeware/simple",
+            "https://pypi.anaconda.org/pyswift/simple",
+            "https://pypi.anaconda.org/kivyschool/simple"
+        ]
+        """
         //let project = pyswift_project_keys(buildozer: btoml?["buildozer-app"]?.table)
         
         //project["cythonized_app"] = cythonized
@@ -66,12 +77,24 @@ extension PyProjectToml {
         //let base = TomlTableHandler(toml: .init(table: try TOMLTable(string: pyproject_text)))
         
         let tool_string = tool_keys(path: path, cythonized: cythonized).convert(to: .toml, options: [
-            .indentArrayElements,
+            .indentArrayElements
         ])
+//        if var pp = try? TOMLTable(string: pyproject_text), var tool = pp["tool"]?.table, tool.contains(key: "psproject") != nil {
+//            tool.remove(at: "psproject")
+//                //if pp.contains(key: "dependency-groups") {
+//            //pp.remove(at: "extra-index-url")
+//            pp.remove(at: "dependency-groups")
+//                //}
+//            pp["tool"] = tool
+//            pyproject_text = pp.convert(to: .toml, options: .indentArrayElements)
+//            
+//        }
+        
         
         pyproject_text = """
-        \(pyproject_text)
-        \(mainToml)
+        \(pyprojectToml.convert(to: .toml, options: .indentArrayElements))
+        
+        \(extra_index_url)
         
         #### PSProject Configuration ####
         
@@ -115,6 +138,8 @@ extension PyProjectToml {
         
         tool_toml.psproject = psproject_keys(path: path, cythonized: cythonized)
         
+        
+        
         toml.tool = tool_toml
         
         
@@ -139,11 +164,11 @@ extension PyProjectToml {
     fileprivate static func pskeys_ios() -> String {
         let toml = TomlTableHandler()
         toml.backends = TOMLArray()
-        toml.extra_index = [
-            "https://pypi.anaconda.org/beeware/simple",
-            "https://pypi.anaconda.org/pyswift/simple",
-            "https://pypi.anaconda.org/kivyschool/simple"
-        ]
+//        toml.extra_index = [
+//            "https://pypi.anaconda.org/beeware/simple",
+//            "https://pypi.anaconda.org/pyswift/simple",
+//            "https://pypi.anaconda.org/kivyschool/simple"
+//        ]
         
         return psprojectBase(key: \.ios, value: toml).table.convert(to: .toml, options: .indentArrayElements)
     }
@@ -151,7 +176,7 @@ extension PyProjectToml {
     fileprivate static func pskeys_macos() -> String {
         //return ""
         let toml = TomlTableHandler()
-        toml.extra_index = TOMLArray()
+        //toml.extra_index = TOMLArray()
         
         return psprojectBase(key: \.macos, value: toml).table.convert(to: .toml, options: .indentArrayElements)
     }
@@ -172,7 +197,7 @@ extension PyProjectToml {
         toml.pip_install_app = true
         toml.copy__main__py = true
         toml.backends = [String]()
-        toml.extra_index = [String]()
+        //toml.extra_index = [String]()
         //toml.swift_packages = TOMLTable()
         toml.info_plist = TOMLTable()
         toml.entitlements = TOMLTable()
@@ -236,6 +261,37 @@ extension PyProjectToml {
     }
 }
 
+extension TOMLTable {
+    func dumpSorted(pyproject: TOMLTable) -> String {
+        
+        
+        
+        return """
+        """
+    }
+    
+    private func dumpTool(tool: TOMLTable) -> String {
+        return """
+        """
+    }
+    
+    private func dumpProject(project: TOMLTable) -> String {
+        let orderedKeys = [
+            "name", "version", "description", "readme", "authors", "requires-python" , "dependencies"
+        ]
+        
+//        let projectLines = orderedKeys.reduce([String]()) { partialResult, next in
+//            if let value = project[next] {
+//                return "\()"
+//            }
+//            return partialResult
+//        }
+        
+        
+        return """
+        """
+    }
+}
 
 
 extension Dictionary where Key == String, Value == any TOMLValueConvertible {
@@ -273,6 +329,24 @@ class TomlTableHandler {
         }
         set {
             toml[key] = newValue.table
+        }
+    }
+    
+    subscript(key: String) -> TomlTableHandler {
+        get {
+            .init(toml: toml)
+        }
+        set {
+            toml[key] = newValue.table
+        }
+    }
+    
+    subscript(key: String) -> (any TOMLValueConvertible)? {
+        get {
+            toml[key]
+        }
+        set {
+            toml[key] = newValue
         }
     }
     

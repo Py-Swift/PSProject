@@ -243,6 +243,24 @@ public class UVTool {
         
     }
     
+    public static func Add(name: String, dev: Bool) {
+        let task = Process()
+        var arguments: [String] = [
+            "add",
+            name,
+        ]
+        if dev {
+            arguments.append("--dev")
+        }
+        
+        task.arguments = arguments
+        task.executablePath = shared.uv
+        task.standardInput = nil
+        task.launch()
+        task.waitUntilExit()
+        
+    }
+    
     //@MainActor
     @_disfavoredOverload
     public static func export_requirements(project: Path, group: String?) {
@@ -296,4 +314,47 @@ public class UVTool {
         let output = String(data: data, encoding: .utf8)!
         return output
     }
+    
+    public static func pipInstall(uv_root: Path, platform: PythonPlatform, dest: Path) {
+        let task = Process()
+        
+        var arguments: [String] = [
+            "pip",
+            "install",
+            uv_root.string,
+            //"--disable-pip-version-check",
+            "--python-platform", platform.rawValue,
+            "--python-version", "3.13",
+            "--index-strategy", "unsafe-best-match"
+        ]
+        
+//        arguments.append(contentsOf: indexes.map { index in
+//            ["--index=\(index)"]
+//        }.flatMap(\.self))
+        
+        arguments.append(contentsOf: [
+            "--target", dest.string,
+            //"-r", requirements.string
+        ])
+        print("uv", arguments)
+        task.arguments = arguments
+        task.executablePath = shared.uv
+        task.standardInput = nil
+        task.launch()
+        task.waitUntilExit()
+    }
+    
+    public enum PythonPlatform: String {
+        
+        case android_aarch64 = "aarch64-linux-android"
+        case android_x86_64 = "x86_64-linux-android"
+        case wasm32 = "wasm32-pyodide2024"
+        case ios_arm64 = "arm64-apple-ios"
+        case ios_sim_arm64 = "arm64-apple-ios-simulator"
+        case ios_sim_x86_64 = "x86_64-apple-ios-simulator"
+        case macos
+        case macos_x86_64 = "x86_64-apple-darwin"
+        case macos_arm64 = "aarch64-apple-darwin"
+    }
 }
+

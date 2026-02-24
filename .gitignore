@@ -61,3 +61,12 @@ fastlane/report.xml
 fastlane/Preview.html
 fastlane/screenshots/**/*.png
 fastlane/test_output
+
+# Python / pip
+build/
+dist/
+*.egg-info/
+__pycache__/
+.venv/
+venv/
+.DS_Store

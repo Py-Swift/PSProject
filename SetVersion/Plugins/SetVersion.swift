@@ -15,6 +15,7 @@ struct SetVersion: CommandPlugin {
                 try "public let LIBRARY_VERSION = \"\(version)\"".write(toFile: version_swift.path.string, atomically: true, encoding: .utf8)
             }
         }
+        context.package.directoryURL
     }
 }
 

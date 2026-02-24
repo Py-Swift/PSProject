@@ -17,7 +17,7 @@ extension PSProject {
             )
         }
         
-        @Argument var path: Path
+        @Argument var path: Path?
         //@Option var name: String?
         @Option var buildozer: Path?
         @Flag var cythonized: Bool = false
@@ -33,9 +33,10 @@ extension PSProject {
             let uv_name = buildozer_app?["package"]?["name"]?.string
             
             try await PyProjectToml.newToml(
-                path: path,
+                path: path ?? .current,
                 uv_name: uv_name,
-                cythonized: cythonized
+                cythonized: cythonized,
+                executedByUV: path == nil
             )
             
         }

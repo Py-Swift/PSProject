@@ -31,7 +31,7 @@ extension Tool.PSProject {
     
     @MainActor
     public func loaded_backends() throws -> [any BackendProtocol] {
-        print(Self.self, "loaded_backends")
+        //print(Self.self, "loaded_backends")
         if loadedBackends.isEmpty {
             loadedBackends = try self.get_backends()
         }
@@ -39,7 +39,7 @@ extension Tool.PSProject {
     }
     @MainActor
     private func get_backends()  throws ->  [any BackendProtocol] {
-        let backends_root = Path.ps_shared + "backends"
+        //let backends_root = Path.ps_shared + "backends"
         let backends = backends ?? []
         
         return (backends).compactMap { b in

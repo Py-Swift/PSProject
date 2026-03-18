@@ -24,10 +24,19 @@ code HelloWorld
 ```
 
 ```bash
+uv add kivy
+```
+
+
+```bash
 uv add psproject --dev
 ```
 psproject is part of the app development and should only be added in dev mode, which uv automatic enables by default.
 pips added in dev group, won't be included in the macos/ios site-packages
+
+```bash
+uv run psproject init
+```
 
 ### Configure for Kivy
 
@@ -51,7 +60,6 @@ backends = [
     "kivyschool.kivylauncher"
 ]
 cythonized = false
-extra_index = []
 pip_install_app = true
 ```
 

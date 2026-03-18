@@ -24,7 +24,7 @@ extension BuildScript {
         let hostPython: Path = .hostPython
         //let pip3 = hostPython + "bin/pip3"
         
-        let pip3 = "\"$(uv python find \(HOST_PYTHON_VER)) -m pip\""
+        let pip3 = "\"uv pip\""
         let extra_target = if let extra_target {
             "\(extra_target)/"
         } else { "" }

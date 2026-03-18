@@ -8,13 +8,15 @@ import Foundation
 
 extension Path: @unchecked Swift.Sendable {}
 
+
+
 //extension Executable {
 //    public static var python3: Self { .path(.init(Path.python3.string)) }
 //    public static var pip3: Self { .path(.init(Path.python3.string)) }
 //}
 
 extension Path {
-    public static var ps_shared: Self { "/Users/shared/psproject" }
+    public static var ps_shared: Self = "/Users/shared/psproject" 
     public static var ps_support: Self { ps_shared + "Support" }
     
     

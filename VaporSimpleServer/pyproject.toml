@@ -1,0 +1,41 @@
+[build-system]
+requires = ["setuptools", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "vapor-simple-server"
+version = "0.1.0"
+description = "Localhost pip simple index server powered by Swift Vapor"
+license = "MIT"
+requires-python = ">=3.13"
+classifiers = [
+    "Operating System :: MacOS :: MacOS X",
+    "Topic :: Software Development :: Build Tools",
+]
+
+[project.urls]
+Homepage = "https://github.com/Py-Swift/PSProject"
+Repository = "https://github.com/Py-Swift/PSProject"
+Issues = "https://github.com/Py-Swift/PSProject/issues"
+
+[tool.setuptools]
+py-modules = []
+
+[tool.cibuildwheel]
+build = ["cp313-macosx_*"]
+skip = ["*-manylinux*", "*-musllinux*", "*-win*"]
+
+[tool.cibuildwheel.macos]
+archs = ["x86_64", "arm64", "universal2"]
+
+[[tool.cibuildwheel.overrides]]
+select = "*-macosx_x86_64"
+environment = { VAPOR_SIMPLE_SERVER_ARCHS = "x86_64" }
+
+[[tool.cibuildwheel.overrides]]
+select = "*-macosx_arm64"
+environment = { VAPOR_SIMPLE_SERVER_ARCHS = "arm64" }
+
+[[tool.cibuildwheel.overrides]]
+select = "*-macosx_universal2"
+environment = { VAPOR_SIMPLE_SERVER_ARCHS = "x86_64 arm64" }

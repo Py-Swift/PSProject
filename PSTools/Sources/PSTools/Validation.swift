@@ -62,9 +62,9 @@ public enum Validation {
         
         let backends = Path.ps_shared + "backends"
         if !backends.exists {
-            try? backends.mkdir()
+            try? backends.mkpath()
         }
-        
+        print(#file, #line, backends)
         let __init__ = backends + "__init__.py"
         if !__init__.exists { try __init__.write("") }
         
@@ -94,7 +94,18 @@ public enum Validation {
         return pyFramework.exists
     }
     
-    
+    public static func validateXcodeGenExist() throws {
+        guard which.validate(member: "xcodegen") else {
+            print("""
+            <psproject create xcode> requires XcodeGen to generate the xcode project
+            
+            run:
+                brew install xcodegen
+            
+            """)
+            throw Which.WhichError.pathNotFound("xcodegen")
+        }
+    }
     
     public static func support() throws {
         let support = Path.ps_support

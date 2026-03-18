@@ -4,11 +4,11 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "psproject"
-version = "1.0.7"
+version = "1.0.8"
 description = "Tool to create PySwiftKit based Apps"
 readme = "README.md"
 license = "MIT"
-requires-python = ">=3.9"
+requires-python = ">=3.13"
 classifiers = [
     "Operating System :: MacOS :: MacOS X",
     "Topic :: Software Development :: Build Tools",

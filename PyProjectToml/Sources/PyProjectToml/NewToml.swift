@@ -235,9 +235,9 @@ extension PyProjectToml {
         let main_py = app_src + "__main__.py"
         let init_py = app_src + "__init__.py"
         
-        if app_py.exists && main_py.exists && init_py.exists {
-            return
-        }
+//        if app_py.exists && main_py.exists && init_py.exists {
+//            return
+//        }
         
         let app_string = """
             def main():
@@ -257,7 +257,7 @@ extension PyProjectToml {
         
         try app_py.write(app_string)
         try main_py.write(main_string)
-        try init_py.write(init_string)
+        try! init_py.write(init_string)
     }
 }
 

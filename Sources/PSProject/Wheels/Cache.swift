@@ -40,7 +40,10 @@ extension PSProject.Wheels {
             @Argument var uv: Path
             
             func run() async throws {
-                if !Validation.hostPython() { return }
+                //if !Validation.hostPython() { return }
+                let root = uv 
+                Path.setPSShared(root)
+                
                 try Validation.backends()
                 
                 //try await launchPython()

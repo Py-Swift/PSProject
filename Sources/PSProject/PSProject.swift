@@ -12,6 +12,8 @@ import PSTools
 import PyProjectToml
 
 
+
+
 @main
 struct PSProject: AsyncParsableCommand {
     
@@ -32,7 +34,11 @@ struct PSProject: AsyncParsableCommand {
     
 }
 
-
+extension Path {
+    static func setPSShared(_ path: Path) {
+        Self.ps_shared = path + ".psproject"
+    }
+}
 
 extension Path: ArgumentParser.ExpressibleByArgument {
     public init?(argument: String) {

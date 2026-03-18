@@ -180,14 +180,12 @@ extension YamlBackend: BackendProtocol {
     public func plist_entries(plist: inout [String:Any], platform: ProjectSpec.Platform) async throws { }
     
     public func install(support: Path, platform: ProjectSpec.Platform) async throws {
-        print(Self.self, "install", name)
         for script in backend.install ?? [] {
             try await script.run()
         }
     }
     
     public func copy_to_site_packages(site_path: Path, platform: ProjectSpec.Platform, py_platform: String) async throws {
-        print(Self.self, "copy_to_site_packages", name)
         for script in backend.copy_to_site_packages ?? [] {
             try await script.run()
         }

@@ -25,6 +25,8 @@ extension PSProject {
         func run() async throws {
             
             //if !Validation.hostPython() { return }
+            let root = path ?? .current
+            Path.setPSShared(root)
             
             let btoml: TOMLTable? = if let buildozer {
                 try BuildozerSpecReader(path: buildozer).export()
@@ -33,7 +35,7 @@ extension PSProject {
             let uv_name = buildozer_app?["package"]?["name"]?.string
             
             try await PyProjectToml.newToml(
-                path: path ?? .current,
+                path: root,
                 uv_name: uv_name,
                 cythonized: cythonized,
                 executedByUV: path == nil

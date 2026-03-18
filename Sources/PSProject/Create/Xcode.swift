@@ -30,8 +30,12 @@ extension PSProject.Create {
         func run() async throws {
             
             let root = directory ?? .current
+            Path.setPSShared(root)
+            
             try Validation.pyprojectExist(root: root)
             //if !Validation.hostPython() { return }
+            
+            try Validation.validateXcodeGenExist()
             try Validation.backends()
             try Validation.support()
             try await Validation.supportPythonFramework()

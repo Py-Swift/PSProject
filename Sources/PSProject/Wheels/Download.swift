@@ -20,7 +20,9 @@ extension PSProject.Wheels.Cache {
         
         func run() async throws {
             
-            if !Validation.hostPython() { return }
+            Path.setPSShared(uv)
+            
+            //if !Validation.hostPython() { return }
             try Validation.backends()
             
             //try await launchPython()

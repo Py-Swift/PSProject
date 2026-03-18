@@ -21,7 +21,7 @@ public class SDL3Backend: BackendProtocol {
     
     public func frameworks() async throws -> [Path] {
         let sdl_fw: Path = .ps_support + "sdl3_frameworks" 
-        
+        return []
         return [
             (sdl_fw + "SDL3.xcframework"),
             (sdl_fw + "SDL3_image.xcframework"),
@@ -52,14 +52,14 @@ public class SDL3Backend: BackendProtocol {
     
     public func install(support: Path, platform: Platform) async throws {
         //if platform == .iOS {
-            let sdl2_frameworks: Path = support + "sdl3_frameworks"
-            if !sdl2_frameworks.exists {
-                try await self.pip_install(
-                    "kivy_sdl3_angle",
-                    "--extra-index-url", self.kivyschool_simple,
-                    "-t", sdl2_frameworks.string
-                )
-            }
+//            let sdl2_frameworks: Path = support + "sdl3_frameworks"
+//            if !sdl2_frameworks.exists {
+//                try await self.pip_install(
+//                    "kivy_sdl3_angle",
+//                    "--extra-index-url", self.kivyschool_simple,
+//                    "-t", sdl2_frameworks.string
+//                )
+//            }
         //}
     }
     

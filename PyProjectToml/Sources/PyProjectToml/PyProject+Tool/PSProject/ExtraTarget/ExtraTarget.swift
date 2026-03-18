@@ -42,7 +42,7 @@ extension Tool.PSProject {
         
         @MainActor
         public func loaded_backends() throws -> [any BackendProtocol] {
-            print(Self.self, "loaded_backends")
+            //print(Self.self, "loaded_backends")
             if _loaded_backends.isEmpty {
                 self._loaded_backends = try self.get_backends()
             }

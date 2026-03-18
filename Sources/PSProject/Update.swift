@@ -88,18 +88,35 @@ extension PSProject {
                                 break
                         }
                         
-//                        if t == .macOS {
-//                            try await platform.pipInstallDesktop(requirements: req_file, extra_index: extra_index)
-//                        } else {
-//                            
-//                            try await platform.pipInstall(requirements: req_file, extra_index: extra_index)
-//                        }
-                        
-                        
-                        //
-//                        for backend in backends {
-//                            try await backend.copy_to_site_packages(site_path: site_path, platform: platform.xcode_target, py_platform: platform.wheel_platform)
-//                        }
+                        switch platform.sdk.type {
+                            case .iphoneos:
+                                let fws = site_path + ".frameworks"
+                                if fws.exists {
+                                    for file in try fws.children() {
+                                        if file.extension == "xcframework" {
+                                            let plat_support = platform.getSupportFolder()
+                                            let orig = plat_support + file.lastComponent
+                                            if orig.exists { try orig.delete() }
+                                            try file.move(orig)
+                                        }
+                                    }
+                                }
+                                
+                            case .iphonesimulator:
+                                let fws = site_path + ".frameworks"
+                                if fws.exists {
+                                    for file in try fws.children() {
+                                        if file.extension == "xcframework" {
+                                            // just assume xcframework from site_package/iphoneos/.frameworks
+                                            // also contains the iphonesimulator binary
+                                            try file.delete()
+                                        }
+                                    }
+                                    
+                                }
+                            case .macos: break
+                        }
+                            
                         
                     }
                 }
@@ -233,10 +250,13 @@ extension PSProject.Update {
             
             print(infoTitle(title: "Cythonize App Module"))
             
+            let root = uv ?? .current
+            Path.setPSShared(root)
+            
             //if !Validation.hostPython() { return }
             try Validation.backends()
                         
-            try await PSProject.Update.cythonizeApp(uv: uv ?? .current)
+            try await PSProject.Update.cythonizeApp(uv: root)
         }
     }
     
@@ -256,12 +276,14 @@ extension PSProject.Update {
             
             print(infoTitle(title: "Updating Site-Packages"))
             
+            let root = uv ?? .current
+            Path.setPSShared(root)
             //if !Validation.hostPython() { return }
             try Validation.backends()
             
             
             try await PSProject.Update.updateSitePackages(
-                uv: uv ?? .current,
+                uv: root,
                 reset: reset
             )
         }
@@ -281,19 +303,21 @@ extension PSProject.Update {
             
             print(infoTitle(title: "Updating Wheels Simple"))
             
+            let root = uv ?? .current
+            Path.setPSShared(root)
             //if !Validation.hostPython() { return }
             try Validation.backends()
             
             
             
-            try await PSProject.Update.updateSimple(uv: uv ?? .current)
+            try await PSProject.Update.updateSimple(uv: root)
             
         }
     }
 }
 
 
-    fileprivate func infoTitle(title: String) -> String {
+    func infoTitle(title: String) -> String {
         var lines = [String]()
         let title_size = title.count
         

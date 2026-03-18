@@ -22,6 +22,7 @@ fileprivate let on_exit = """
 exit(exit_status)
 """
 
+fileprivate let new_mode = false
 
 public final class Kivy3Launcher: SDL3Backend {
     
@@ -33,7 +34,11 @@ public final class Kivy3Launcher: SDL3Backend {
     
     
     public override func exclude_dependencies() throws -> [String] {
-        ["kivy.2", "kivy.3", "kivy==", "kivy>=", "kivy>"]
+        if new_mode {
+            []
+        } else {
+            ["kivy.2", "kivy.3", "kivy==", "kivy>=", "kivy>"]
+        }
     }
     
     public override func packages() async throws -> [String : SwiftPackage] {
@@ -100,31 +105,61 @@ public final class Kivy3Launcher: SDL3Backend {
     }
     
     public override func copy_to_site_packages(site_path: Path, platform: Platform, py_platform: String) async throws {
-        switch platform {
-            case .iOS:
-                try await self.pip_install(
-                    "kivy>=3.0.0.dev0",
-                    "--upgrade",
-                    "--disable-pip-version-check",
-                    "--platform=\(py_platform)",
-                    "--only-binary=:all:",
-                    "--extra-index-url", self.pyswift_simple,
-                    "--extra-index-url", self.beeware_simple,
-                    "--extra-index-url", self.kivyschool_simple,
-                    "--python-version=313",
-                    "--target", site_path.string
-                )
-            case .macOS:
-                try await self.pip_install(
-                    "kivy>=2.3.1",
-                    "--upgrade",
-                    "--disable-pip-version-check",
-                    "--only-binary=:all:",
-                    "--python-version=313",
-                    "--target", site_path.string
-                )
-            default:
-                fatalError("\(platform) not implemented")
+        
+//        switch platform {
+//            case .iOS:
+//                try await self.pip_install(
+//                    "kivy>=3.0.0.dev0",
+//                    "--upgrade",
+//                    "--disable-pip-version-check",
+//                    "--platform=\(py_platform)",
+//                    "--only-binary=:all:",
+//                    "--extra-index-url", self.pyswift_simple,
+//                    "--extra-index-url", self.beeware_simple,
+//                    "--extra-index-url", self.kivyschool_simple,
+//                    "--python-version=313",
+//                    "--target", site_path.string
+//                )
+//            case .macOS:
+//                try await self.pip_install(
+//                    "kivy>=2.3.1",
+//                    "--upgrade",
+//                    "--disable-pip-version-check",
+//                    "--only-binary=:all:",
+//                    "--python-version=313",
+//                    "--target", site_path.string
+//                )
+//            default:
+//                fatalError("\(platform) not implemented")
+//        }
+    }
+    
+    public override func install(support: Path, platform: Platform) async throws {
+        //if platform == .iOS {
+        
+        
+        
+        let sdl_frameworks: Path = support + "sdl3_frameworks"
+        if !sdl_frameworks.exists {
+            try await self.pip_install(
+                "kivy_sdl3_angle",
+                "--extra-index-url", self.kivyschool_simple,
+                "-t", sdl_frameworks.string
+            )
+        }
+        //}
+        
+    }
+    
+    public func do_install(support: Path, platform: ProjectSpec.Platform) async throws {
+        try await install(support: .ps_support, platform: platform)
+        
+        for fw in try await frameworks() {
+            let path = fw
+            let target = support + path.lastComponent
+            print(fw, target)
+            if target.exists { continue }
+            try path.copy(target)
         }
     }
 }

@@ -32,7 +32,7 @@ public class PyFrameworkBackend: BackendProtocol {
         let _support = Path.ps_support
         let py_fw  = _support + "Python.xcframework"
         
-        
+        print(#file, #line, py_fw)
         
         
         

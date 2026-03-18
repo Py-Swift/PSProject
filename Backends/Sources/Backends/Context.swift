@@ -116,6 +116,8 @@ public protocol ContextProtocol: Sendable {
     
     func getSourcesFolder() -> Path
     
+    func getSupportFolder() -> Path
+    
     func createSiteFolder(forced: Bool) async throws
     
     func createTargetFolder(forced: Bool) async throws
@@ -239,6 +241,10 @@ public extension PlatformContext {
     
     func getSourcesFolder() -> Path {
         getTargetFolder() + "Sources"
+    }
+    
+    func getSupportFolder() -> Path {
+        getTargetFolder() + "Support"
     }
 }
 

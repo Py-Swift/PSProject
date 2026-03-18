@@ -168,14 +168,15 @@ public enum PyTools {
     @discardableResult
     public static func pipInstall(pip: String, _ args: String...) -> Int32 {
         let task = Process()
-        
+        print(#file, #line, UVTool.getUV())
         let arguments = [
+            "pip",
             "install",
             pip
         ] + args
         
         task.arguments = arguments
-        task.executablePath = pip3
+        task.executablePath = UVTool.getUV()
         task.standardInput = nil
         task.launch()
         task.waitUntilExit()
@@ -187,12 +188,13 @@ public enum PyTools {
         let task = Process()
         
         let arguments = [
+            "pip",
             "install",
             pip
         ] + args
         
         task.arguments = arguments
-        task.executablePath = pip3
+        task.executablePath = UVTool.getUV()
         task.standardInput = nil
         task.launch()
         task.waitUntilExit()
@@ -221,6 +223,8 @@ public class UVTool {
         task.waitUntilExit()
         
     }
+    
+    public static func getUV() -> Path { shared.uv }
     
     //@MainActor
     public static func Init(path: String, name: String?) {
@@ -259,6 +263,35 @@ public class UVTool {
         task.launch()
         task.waitUntilExit()
         
+    }
+    
+    public static func PythonFind(version: String) -> String {
+        let task = Process()
+        let pipe = Pipe()
+        task.standardOutput = pipe
+        task.standardError = pipe
+        task.arguments = [
+            "python",
+            "find",
+            version
+        ]
+        task.executablePath = shared.uv
+        task.standardInput = nil
+        task.launch()
+        task.waitUntilExit()
+        let data = pipe.fileHandleForReading.readDataToEndOfFile()
+        let output = String(data: data, encoding: .utf8)!
+        print(output)
+        return output
+    }
+    
+    public static func PythonFind(version: String) -> Path {
+        .init(PythonFind(version: version))
+    }
+    
+    public static func uvPip(version: String) -> Path {
+        let pip = PythonFind(version: version).parent() + "pip"
+        return pip
     }
     
     //@MainActor

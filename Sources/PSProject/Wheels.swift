@@ -20,8 +20,8 @@ extension PSProject {
             subcommands: [
                 //Cache.self,
                 List.self,
-                Test.self,
-                Validate.self
+                //Test.self,
+                //Validate.self
                 
             ]
         )

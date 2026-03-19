@@ -47,7 +47,7 @@ extension Tool.PSProject {
                 case .kivylauncher: KivyLauncher()
                 case .kivy3launcher: Kivy3Launcher()
                 case .pyswiftui: PySwiftUI()
-                case .none: fatalError()
+                case .none: fatalError("\(b) is not a supported backend")
             }
         }
         

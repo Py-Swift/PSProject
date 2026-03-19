@@ -47,7 +47,7 @@ extension PyProjectToml {
         let mainToml =  TOMLTable()
         let dep_groups = pyprojectToml["dependency-groups"]?.table ?? TOMLTable()
         
-        dep_groups["iphoneos"] = TOMLArray()
+        //dep_groups["iphoneos"] = TOMLArray()
         if cythonized {
             dep_groups["dev"] =  ["cython"]
         }
@@ -62,13 +62,20 @@ extension PyProjectToml {
             if tool.contains(key: "psproject") { return }
         }
         
+
         let extra_index_url = """
+        [tool.uv]
+        index-strategy = "unsafe-best-match"
+        find-links = [ "./wheelhouse" ]
+        
+        
         [tool.uv.pip]
         extra-index-url = [
             "https://pypi.anaconda.org/beeware/simple",
             "https://pypi.anaconda.org/pyswift/simple",
             "https://pypi.anaconda.org/kivyschool/simple"
         ]
+        find-links = [ "./wheelhouse" ]
         """
         //let project = pyswift_project_keys(buildozer: btoml?["buildozer-app"]?.table)
         
@@ -125,6 +132,12 @@ extension PyProjectToml {
             }
             try setup_py.write(cythonized_setup_py)
             try menifest.write(cythonized_manifest_in)
+        }
+        
+        let wheelhouse = path + "wheelhouse"
+        
+        if !wheelhouse.exists {
+            try? wheelhouse.mkpath()
         }
     }
 }

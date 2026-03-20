@@ -55,6 +55,20 @@ extension XcodeProjectBuilder {
 fileprivate extension XcodeProjectBuilder.AppExtensionTarget {
     
     func settings() async throws -> Settings {
+        // TODO: Merge target-level presets from SettingPresets before your custom keys.
+        // For app extensions, XcodeGen loads platform (iOS) + product (appExtension) presets.
+        // These set LD_RUNPATH_SEARCH_PATHS for extension bundles, SDKROOT, etc.
+        //
+        // Use SettingPresets.targetSettings(platform:productType:) as a base:
+        //
+        //   var configDict = SettingPresets.targetSettings(platform: .iOS, productType: .appExtension)
+        //   configDict.merge([...your overrides...]) { _, new in new }
+        //
+        // Also merge supportedDestinations if needed:
+        //
+        //   let destSettings = SettingPresets.supportedDestinationSettings([.iOS])
+        //   configDict.merge(destSettings) { _, new in new }
+        //
         let configDict: [String: Any] = [
             "LIBRARY_SEARCH_PATHS": [
                 "$(inherited)",

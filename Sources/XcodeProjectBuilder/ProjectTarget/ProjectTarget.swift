@@ -58,6 +58,21 @@ extension XcodeProjectBuilder {
 fileprivate extension XcodeProjectBuilder.ProjectTarget {
     
     func settings() async throws -> Settings {
+        // TODO: Merge target-level presets from SettingPresets before your custom keys.
+        // XcodeGen normally loads platform (iOS/macOS), product (application), and
+        // product+platform (application_iOS) presets from its .bundle here.
+        // These set things like SDKROOT, LD_RUNPATH_SEARCH_PATHS, ASSETCATALOG_COMPILER_APPICON_NAME.
+        //
+        // Use SettingPresets.targetSettings(platform:productType:) as a base, then merge your overrides:
+        //
+        //   var configDict = SettingPresets.targetSettings(platform: .iOS, productType: .application)
+        //   configDict.merge([...your overrides...]) { _, new in new }
+        //
+        // Also merge supportedDestinations presets if using multi-platform:
+        //
+        //   let destSettings = SettingPresets.supportedDestinationSettings([.iOS, .macOS])
+        //   configDict.merge(destSettings) { _, new in new }
+        //
         let configDict: [String: Any] = [
             "LIBRARY_SEARCH_PATHS": [
                 "$(inherited)",

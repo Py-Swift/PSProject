@@ -108,7 +108,20 @@ extension XcodeProjectBuilder.Project {
     }
     
     fileprivate func settings() async throws -> Settings {
-        .empty
+        // TODO: Replace .empty with project-level preset settings from SettingPresets.
+        // XcodeGen normally loads base.yml + debug/release.yml from its .bundle here.
+        // Since the .bundle isn't available when pip-installed, use:
+        //
+        //   .init(configSettings: [
+        //       "Debug":   .init(dictionary: SettingPresets.projectSettings(configType: .debug)),
+        //       "Release": .init(dictionary: SettingPresets.projectSettings(configType: .release)),
+        //   ])
+        //
+        // projectSettings merges: base (warnings, ARC, etc.) + config (optimization, debug info)
+        .init(configSettings: [
+            "Debug": .init(dictionary: SettingPresets.projectSettings(configType: .debug)),
+            "Release": .init(dictionary: SettingPresets.projectSettings(configType: .release)),
+        ])
     }
     
     fileprivate func settingGroups() async throws -> [String : Settings] {
@@ -149,7 +162,15 @@ extension XcodeProjectBuilder.Project {
     }
     
     fileprivate func specOptions() async throws -> SpecOptions {
-        return .init(bundleIdPrefix: "org.pyswift")
+        // TODO: Add `settingPresets: .none` to stop XcodeGen from looking for
+        // XcodeGen_XcodeGenKit.bundle at runtime. Without this, it tries to load
+        // SettingPresets/*.yml from the .bundle and prints "No settings found" warnings.
+        // Once you provide settings via SettingPresets.swift dictionaries above,
+        // change this to:
+        //
+        //   return .init(bundleIdPrefix: "org.pyswift", settingPresets: .none)
+        //
+        return .init(bundleIdPrefix: "org.pyswift", settingPresets: .none)
     }
     
     fileprivate func fileGroups() async throws -> [String] {

@@ -17,10 +17,13 @@ extension PSProject {
             )
         }
         
-        @Argument var path: Path?
-        //@Option var name: String?
+        @Option var path: Path?
+        @Option var name: String?
         @Option var buildozer: Path?
         @Flag var cythonized: Bool = false
+        @Option var backend: [String] = []
+        
+        
         
         func run() async throws {
             
@@ -32,13 +35,15 @@ extension PSProject {
                 try BuildozerSpecReader(path: buildozer).export()
             } else { nil }
             let buildozer_app = btoml?["buildozer-app"]?.table
-            let uv_name = buildozer_app?["package"]?["name"]?.string
+            let uv_name = name ?? buildozer_app?["package"]?["name"]?.string
+            
             
             try await PyProjectToml.newToml(
                 path: root,
-                uv_name: uv_name,
+                app_name: name,
                 cythonized: cythonized,
-                executedByUV: path == nil
+                executedByUV: path == nil,
+                backends: backend
             )
             
         }

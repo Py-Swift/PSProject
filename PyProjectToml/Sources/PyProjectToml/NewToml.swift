@@ -10,11 +10,11 @@ import PSTools
 
 
 extension PyProjectToml {
-    public static func newToml(path: Path, uv_name: String?, cythonized: Bool, executedByUV: Bool) async throws  {
+    public static func newToml(path: Path, app_name: String?, cythonized: Bool, executedByUV: Bool, backends: [String]) async throws  {
         let pyproject = path + "pyproject.toml"
         
         if !pyproject.exists {
-            UVTool.Init(path: path.string, name: uv_name ?? path.lastComponent)
+            UVTool.Init(path: path.string, name:  path.lastComponent)
         }
         var pyproject_text = try pyproject.read(.utf8)
         
@@ -83,7 +83,7 @@ extension PyProjectToml {
         
         //let base = TomlTableHandler(toml: .init(table: try TOMLTable(string: pyproject_text)))
         
-        let tool_string = tool_keys(path: path, cythonized: cythonized).convert(to: .toml, options: [
+        let tool_string = tool_keys(path: path, cythonized: cythonized, backends: backends, name_override: app_name).convert(to: .toml, options: [
             .indentArrayElements
         ])
 //        if var pp = try? TOMLTable(string: pyproject_text), var tool = pp["tool"]?.table, tool.contains(key: "psproject") != nil {
@@ -144,12 +144,12 @@ extension PyProjectToml {
 
 
 extension PyProjectToml {
-    fileprivate static func tool_keys(path: Path, cythonized: Bool) -> TOMLTable {
+    fileprivate static func tool_keys(path: Path, cythonized: Bool, backends: [String]?, name_override: String?) -> TOMLTable {
         let toml = TomlTableHandler()
         
         let tool_toml = TomlTableHandler()
         
-        tool_toml.psproject = psproject_keys(path: path, cythonized: cythonized)
+        tool_toml.psproject = psproject_keys(path: path, cythonized: cythonized, backends: backends, name_override: name_override)
         
         
         
@@ -201,15 +201,15 @@ extension PyProjectToml {
         return psprojectBase(key: \.swift_packages, value: TOMLTable()).table.convert(to: .toml, options: .indentArrayElements)
     }
     
-    fileprivate static func psproject_keys(path: Path, cythonized: Bool) -> TOMLTable {
+    fileprivate static func psproject_keys(path: Path, cythonized: Bool, backends: [String]?, name_override: String?) -> TOMLTable {
         let toml = TomlTableHandler()
         
-        let app_name = path.lastComponent
+        let app_name = name_override ?? path.lastComponent
         toml.app_name = app_name
         toml.cythonized = cythonized
         toml.pip_install_app = true
         toml.copy__main__py = true
-        toml.backends = [String]()
+        toml.backends = backends ?? [String]()
         //toml.extra_index = [String]()
         //toml.swift_packages = TOMLTable()
         toml.info_plist = TOMLTable()

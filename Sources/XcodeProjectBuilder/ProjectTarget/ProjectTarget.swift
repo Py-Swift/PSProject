@@ -79,6 +79,7 @@ fileprivate extension XcodeProjectBuilder.ProjectTarget {
             ],
             "SWIFT_VERSION": "5.0",
             "ENABLE_BITCODE": false,
+            "CODE_SIGN_STYLE": "Automatic",
             //"PRODUCT_NAME": "$(PROJECT_NAME)"
         ]
         //        if let projectSpec = project?.projectSpecData {

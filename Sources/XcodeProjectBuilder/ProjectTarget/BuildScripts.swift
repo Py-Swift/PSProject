@@ -21,8 +21,6 @@ extension BuildScript.ScriptType: Swift.ExpressibleByStringLiteral {
 extension BuildScript {
     
     static func installAppModule(pythonProject: Path, extra_target: String?) -> BuildScript {
-        let hostPython: Path = .hostPython
-        //let pip3 = hostPython + "bin/pip3"
         
         let pip3 = "\"uv pip\""
         let extra_target = if let extra_target {
@@ -31,7 +29,8 @@ extension BuildScript {
         
         return .init(
             script: .script("""
-            
+            export PATH="$HOME/.local/bin:$PATH"
+
             APP_SRC="$PROJECT_DIR/../../"
             PIP3=\(pip3)
             PIP_ARGS="--compile -U --no-deps"

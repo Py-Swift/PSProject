@@ -77,6 +77,10 @@ fileprivate extension XcodeProjectBuilder.ProjectTarget {
             "LIBRARY_SEARCH_PATHS": [
                 "$(inherited)",
             ],
+            "LD_RUNPATH_SEARCH_PATHS": [
+                "$(inherited)",
+                "@executable_path/Frameworks",
+            ],
             "SWIFT_VERSION": "5.0",
             "ENABLE_BITCODE": false,
             "CODE_SIGN_STYLE": "Automatic",

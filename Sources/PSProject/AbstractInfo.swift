@@ -7,11 +7,15 @@
 
 
 extension PSProject.Create {
-    static let abstractInfo: String = "Create iOS/macOS project"
+    static let abstractInfo: String = "Create iOS/macOS/Android project"
 }
 
 extension PSProject.Create.Xcode {
     static let abstractInfo: String = "Create Xcode Project Type"
+}
+
+extension PSProject.Create.Gradle {
+    static let abstractInfo: String = "Create Android Gradle project (via python-for-android)"
 }
 
 

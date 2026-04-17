@@ -48,8 +48,20 @@ let targets: [Target] = [
             .product(name: "PipRepo", package: "WheelBuilder"),
             .product(name: "ProjectSpec", package: "XcodeGen"),
             "XcodeProjectBuilder",
+            "GradleProjectBuilder",
             "PathKit",
             "TemplateGenerator"
+        ],
+        swiftSettings: [
+            .swiftLanguageMode(.v5)
+        ]
+    ),
+    .target(
+        name: "GradleProjectBuilder",
+        dependencies: [
+            "PyProjectToml",
+            "Backends",
+            "PathKit",
         ],
         swiftSettings: [
             .swiftLanguageMode(.v5)
@@ -86,7 +98,8 @@ let package = Package(
     platforms: [.macOS(.v15)],
     products: [
         .executable(name: "PSProject", targets: ["PSProject"]),
-        .library(name: "XcodeProjectBuilder", targets: ["XcodeProjectBuilder"])
+        .library(name: "XcodeProjectBuilder", targets: ["XcodeProjectBuilder"]),
+        .library(name: "GradleProjectBuilder", targets: ["GradleProjectBuilder"])
     ],
     dependencies: getDependencies(),
     targets: targets

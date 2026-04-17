@@ -55,37 +55,14 @@ extension XcodeProjectBuilder {
 fileprivate extension XcodeProjectBuilder.AppExtensionTarget {
     
     func settings() async throws -> Settings {
-        // TODO: Merge target-level presets from SettingPresets before your custom keys.
-        // For app extensions, XcodeGen loads platform (iOS) + product (appExtension) presets.
-        // These set LD_RUNPATH_SEARCH_PATHS for extension bundles, SDKROOT, etc.
-        //
-        // Use SettingPresets.targetSettings(platform:productType:) as a base:
-        //
-        //   var configDict = SettingPresets.targetSettings(platform: .iOS, productType: .appExtension)
-        //   configDict.merge([...your overrides...]) { _, new in new }
-        //
-        // Also merge supportedDestinations if needed:
-        //
-        //   let destSettings = SettingPresets.supportedDestinationSettings([.iOS])
-        //   configDict.merge(destSettings) { _, new in new }
-        //
-        let configDict: [String: Any] = [
-            "LIBRARY_SEARCH_PATHS": [
-                "$(inherited)",
-            ],
-            "SWIFT_VERSION": "5.0",
+        var configDict = SettingPresets.targetSettings(platform: .iOS, productType: .appExtension)
+        configDict.merge([
+            "LIBRARY_SEARCH_PATHS": ["$(inherited)"],
             "ENABLE_BITCODE": false,
             "CODE_SIGN_STYLE": "Automatic",
-            //"PRODUCT_NAME": "$(PROJECT_NAME)"
-        ]
-        //        if let projectSpec = project?.projectSpecData {
-        //            try loadBuildConfigKeys(from: projectSpec, keys: &configDict)
-        //        }
-        
-        var configSettings: Settings {
-            .init(dictionary: configDict)
-        }
-        
+        ] as [String: Any]) { _, new in new }
+
+        let configSettings = Settings(dictionary: configDict)
         return .init(configSettings: [
             "Debug": configSettings,
             "Release": configSettings

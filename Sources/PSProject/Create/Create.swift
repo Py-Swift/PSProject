@@ -13,7 +13,8 @@ extension PSProject {
             .init(
                 abstract: abstractInfo,
                 subcommands: [
-                    Xcode.self
+                    Xcode.self,
+                    Gradle.self
                 ]
             )
         }

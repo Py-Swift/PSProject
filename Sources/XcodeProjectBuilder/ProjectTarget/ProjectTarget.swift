@@ -58,42 +58,17 @@ extension XcodeProjectBuilder {
 fileprivate extension XcodeProjectBuilder.ProjectTarget {
     
     func settings() async throws -> Settings {
-        // TODO: Merge target-level presets from SettingPresets before your custom keys.
-        // XcodeGen normally loads platform (iOS/macOS), product (application), and
-        // product+platform (application_iOS) presets from its .bundle here.
-        // These set things like SDKROOT, LD_RUNPATH_SEARCH_PATHS, ASSETCATALOG_COMPILER_APPICON_NAME.
-        //
-        // Use SettingPresets.targetSettings(platform:productType:) as a base, then merge your overrides:
-        //
-        //   var configDict = SettingPresets.targetSettings(platform: .iOS, productType: .application)
-        //   configDict.merge([...your overrides...]) { _, new in new }
-        //
-        // Also merge supportedDestinations presets if using multi-platform:
-        //
-        //   let destSettings = SettingPresets.supportedDestinationSettings([.iOS, .macOS])
-        //   configDict.merge(destSettings) { _, new in new }
-        //
-        let configDict: [String: Any] = [
-            "LIBRARY_SEARCH_PATHS": [
-                "$(inherited)",
-            ],
-            "LD_RUNPATH_SEARCH_PATHS": [
-                "$(inherited)",
-                "@executable_path/Frameworks",
-            ],
-            "SWIFT_VERSION": "5.0",
+        var configDict = SettingPresets.targetSettings(platform: .auto, productType: .application)
+        let destSettings = SettingPresets.supportedDestinationSettings([.iOS, .macOS])
+        configDict.merge(destSettings) { _, new in new }
+        configDict.merge([
+            "LIBRARY_SEARCH_PATHS": ["$(inherited)"],
+            "LD_RUNPATH_SEARCH_PATHS": ["$(inherited)", "@executable_path/Frameworks", "@executable_path/../Frameworks"],
             "ENABLE_BITCODE": false,
             "CODE_SIGN_STYLE": "Automatic",
-            //"PRODUCT_NAME": "$(PROJECT_NAME)"
-        ]
-        //        if let projectSpec = project?.projectSpecData {
-        //            try loadBuildConfigKeys(from: projectSpec, keys: &configDict)
-        //        }
-        
-        var configSettings: Settings {
-            .init(dictionary: configDict)
-        }
-        
+        ] as [String: Any]) { _, new in new }
+
+        let configSettings = Settings(dictionary: configDict)
         return .init(configSettings: [
             "Debug": configSettings,
             "Release": configSettings
